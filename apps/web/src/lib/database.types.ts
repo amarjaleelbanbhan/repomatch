@@ -212,6 +212,7 @@ export type Database = {
           languages: string[]
           last_active_at: string | null
           locale: string
+          owned_stars: number
           skill_level: Database["public"]["Enums"]["skill_level"]
           topics: string[]
           total_contributions: number
@@ -225,6 +226,7 @@ export type Database = {
           languages?: string[]
           last_active_at?: string | null
           locale?: string
+          owned_stars?: number
           skill_level?: Database["public"]["Enums"]["skill_level"]
           topics?: string[]
           total_contributions?: number
@@ -238,6 +240,7 @@ export type Database = {
           languages?: string[]
           last_active_at?: string | null
           locale?: string
+          owned_stars?: number
           skill_level?: Database["public"]["Enums"]["skill_level"]
           topics?: string[]
           total_contributions?: number

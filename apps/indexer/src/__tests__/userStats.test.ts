@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { mapUserStats } from "../userStats.js";
 
-function makeRaw(overrides: Partial<{ totalContributions: number; days: { date: string; contributionCount: number }[]; owned: string[]; starred: string[] }> = {}) {
+function makeRaw(overrides: Partial<{ totalContributions: number; days: { date: string; contributionCount: number }[]; owned: { nameWithOwner: string; stargazerCount: number }[]; starred: string[] }> = {}) {
   const days = overrides.days ?? [
     { date: "2026-07-01", contributionCount: 1 },
     { date: "2026-07-02", contributionCount: 2 },
@@ -15,7 +15,7 @@ function makeRaw(overrides: Partial<{ totalContributions: number; days: { date: 
           weeks: [{ contributionDays: days }],
         },
       },
-      repositories: { nodes: (overrides.owned ?? ["me/repo-a"]).map((nameWithOwner) => ({ nameWithOwner })) },
+      repositories: { nodes: overrides.owned ?? [{ nameWithOwner: "me/repo-a", stargazerCount: 12 }] },
       starredRepositories: {
         nodes: (overrides.starred ?? ["octocat/hello-world"]).map((nameWithOwner) => ({ nameWithOwner })),
       },
@@ -35,6 +35,7 @@ describe("mapUserStats", () => {
     expect(result!.contributionStreak).toBe(0); // most recent day (07-03) has 0 contributions
     expect(result!.lastActiveAt).toBe("2026-07-02");
     expect(result!.ownedRepoNames).toEqual(["me/repo-a"]);
+    expect(result!.ownedStars).toBe(12);
     expect(result!.starredRepoNames).toEqual(["octocat/hello-world"]);
   });
 

@@ -75,6 +75,7 @@ export async function matchCycleForUser(
           contribution_streak: stats.contributionStreak,
           total_contributions: stats.totalContributions,
           last_active_at: stats.lastActiveAt,
+          owned_stars: stats.ownedStars,
         })
         .eq("id", user.id);
       if (error) throw new Error(`Failed to update user stats: ${error.message}`);

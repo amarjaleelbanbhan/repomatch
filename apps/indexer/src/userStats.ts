@@ -12,7 +12,7 @@ const USER_STATS_QUERY = `
         }
       }
       repositories(first: 100, ownerAffiliations: OWNER, isFork: false, privacy: PUBLIC) {
-        nodes { nameWithOwner }
+        nodes { nameWithOwner stargazerCount }
       }
       starredRepositories(first: 100) {
         nodes { nameWithOwner }
@@ -29,7 +29,7 @@ interface RawUserStats {
         weeks: { contributionDays: ContributionDay[] }[];
       };
     };
-    repositories: { nodes: { nameWithOwner: string }[] };
+    repositories: { nodes: { nameWithOwner: string; stargazerCount: number }[] };
     starredRepositories: { nodes: { nameWithOwner: string }[] };
   } | null;
 }
@@ -39,6 +39,7 @@ export interface UserStats {
   contributionStreak: number;
   lastActiveAt: string | null;
   ownedRepoNames: string[];
+  ownedStars: number;
   starredRepoNames: string[];
 }
 
@@ -55,6 +56,7 @@ export function mapUserStats(raw: RawUserStats): UserStats | null {
     contributionStreak: computeContributionStreak(days),
     lastActiveAt: mostRecentActiveDate(days),
     ownedRepoNames: raw.user.repositories.nodes.map((n) => n.nameWithOwner),
+    ownedStars: raw.user.repositories.nodes.reduce((sum, n) => sum + n.stargazerCount, 0),
     starredRepoNames: raw.user.starredRepositories.nodes.map((n) => n.nameWithOwner),
   };
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { escapeXml, renderSetupCardSvg, renderWidgetSvg } from "../svg.js";
+import { escapeXml, renderActivityCardSvg, renderSetupCardSvg, renderWidgetSvg } from "../svg.js";
 import { getThemeColors } from "../theme.js";
 
 describe("escapeXml", () => {
@@ -27,5 +27,42 @@ describe("renderWidgetSvg", () => {
     );
     expect(svg.match(/<g /g)).toHaveLength(2);
     expect(new TextEncoder().encode(svg).length).toBeLessThan(15 * 1024);
+  });
+});
+
+describe("renderActivityCardSvg", () => {
+  const stats = {
+    contributionStreak: 5,
+    totalContributions: 320,
+    ownedStars: 42,
+    topLanguages: ["TypeScript", "Python"],
+  };
+
+  it("renders stats even with zero recommendations (FR-4.11 graceful degradation)", () => {
+    const svg = renderActivityCardSvg(stats, [], getThemeColors("dark"));
+    expect(svg).toContain("5-day streak");
+    expect(svg).toContain("320 contributions");
+    expect(svg.match(/<g /g)).toBeNull();
+    expect(new TextEncoder().encode(svg).length).toBeLessThan(15 * 1024);
+  });
+
+  it("renders the next-repo-to-try section when a rec is present", () => {
+    const svg = renderActivityCardSvg(
+      stats,
+      [{ fullName: "octocat/hello", description: "demo", primaryLanguage: "TypeScript", stars: 10, reason: "matched: typescript" }],
+      getThemeColors("light"),
+    );
+    expect(svg).toContain("NEXT REPO TO TRY");
+    expect(svg.match(/<g /g)).toHaveLength(1);
+    expect(new TextEncoder().encode(svg).length).toBeLessThan(15 * 1024);
+  });
+
+  it("escapes malicious language/stat input", () => {
+    const svg = renderActivityCardSvg(
+      { ...stats, topLanguages: ["<script>alert(1)</script>"] },
+      [],
+      getThemeColors("dark"),
+    );
+    expect(svg).not.toContain("<script>alert");
   });
 });
