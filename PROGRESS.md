@@ -35,20 +35,25 @@
 - [x] User stats + match cycle job: contribution streak/total/owned stars, matcher v1 scoring, writes recommendations (FR-3.1–3.4, FR-4.8–4.10) — **verified live**: real user now shows 6-day streak, 457 contributions, 18 owned stars, 10 recommendations written
 - [x] OSS Activity Card widget rendering: streak, contributions, stars, top languages, 1 "next repo to try" card, graceful degradation to zero-state (FR-4.8–4.11) — **verified live** with real (non-zero) data end-to-end
 - [x] Onboarding flow: auto-detected interests (FR-1.2), 3-step wizard (FR-1.3–1.4), edit + account deletion (FR-1.5) — **code complete**; `GITHUB_PAT` set on `repomatch-web` Vercel env, live interest-detection not yet manually verified through the actual wizard UI
-- [ ] Upstash widget caching (24h TTL, `widget:{username}` key) — **not started**, needs an Upstash account (new signup, not yet requested from user)
+- [ ] Upstash widget caching (24h TTL, `widget:{username}` key) — **not started**, needs an Upstash account (new signup — blocked on user)
 - [x] Landing page: live demo widget, 3-step setup, open-source badge
+- [x] Widget visual redesign: tokyonight palette (matches the user's own GitHub profile aesthetic), gradient accent bar, rounded frame — verified live
+- [x] Web app dark-theme styling: globals.css, gradient CTAs, chips, danger-zone button — verified via computed-style inspection
+- [ ] Embed widget in user's GitHub profile README — **blocked on explicit user confirmation** (auto-mode classifier requires an unambiguous "yes, push this" for writes to external public repos; queued, diff prepared)
 
 **Secrets wired:** `INDEXER_GITHUB_PAT`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (GitHub Actions repo secrets) + `GITHUB_PAT`, `SUPABASE_SERVICE_ROLE_KEY` (repomatch-web Vercel env). Nightly indexer runs on cron `17 3 * * *` UTC and via manual `workflow_dispatch`.
 
 **Exit criteria (not yet met):** stats card renders correctly for 50 users; recs directionally reasonable. Currently verified for 1 real user (the platform's own first signup).
 
-## Phase 2 — Smart Matching + Dashboard — not started
+## Phase 2 — Smart Matching + Dashboard
 
-- [ ] pgvector + Hugging Face embeddings, matcher v2 semantic scoring (FR-3.5)
-- [ ] 👍/👎/hide feedback loop influencing next cycle (FR-3.6, FR-5.3–5.4)
-- [ ] Web dashboard: full match list, filters (FR-5.1–5.2)
-- [ ] Public match page per user (FR-5.5)
-- [ ] Plain-English/Urdu repo summaries (FR-2.6)
+- [ ] pgvector + Hugging Face embeddings, matcher v2 semantic scoring (FR-3.5) — **not started**, needs a Hugging Face Inference API key (blocked on user)
+- [x] 👍/👎/known/hide feedback controls, wired to `feedback` table (FR-5.3) — **verified live** (build + route checks)
+- [x] Feedback boosts/penalizes future recs by shared topics/languages (FR-3.6, FR-5.4) — pure `computeFeedbackAdjustment` function, tested, wired into the nightly match cycle
+- [x] Web dashboard: full match list (`/matches`) with language + "welcoming repo" filters, repo detail (health score, stars, CONTRIBUTING.md) (FR-5.1–5.2) — **verified live** (build + redirect checks)
+- [x] Public match page per user (`/u/{username}`, no login required, sign-up CTA) (FR-5.5) — **verified live**: real user's page renders their actual 10 recommendations; unknown username correctly 404s
+- [x] Good-first-issue detection (`gfi_count` via GraphQL label search) + skill-aware matching (beginners biased toward welcoming repos) (FR-2.5, FR-3.7) — **verified live**: 179 indexed repos have good-first-issues (2582 total)
+- [ ] Plain-English/Urdu repo summaries (FR-2.6) — **not started**, needs an LLM/translation capability
 
 ## Phase 3 — Social Layer — not started
 
