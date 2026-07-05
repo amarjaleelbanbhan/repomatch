@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/widget/[username].ts": {
+      "runtime": "edge"
+    }
+  }
+}
