@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { rankMatches } from "@repomatch/matcher";
+import { computeFeedbackAdjustment, isEligible, scoreRepo } from "@repomatch/matcher";
 import type { CandidateRepo, SkillLevel, UserProfile } from "@repomatch/matcher";
 import { fetchUserStats } from "./userStats.js";
 
@@ -42,6 +42,35 @@ async function loadHiddenRepoIds(supabase: SupabaseClient, userId: string): Prom
 
   if (error) throw new Error(`Failed to load hidden feedback: ${error.message}`);
   return (data ?? []).map((row) => row.repo_id);
+}
+
+interface FeedbackTags {
+  liked: string[];
+  disliked: string[];
+}
+
+/** FR-5.4: aggregates languages/topics from the user's up/down-voted repos to bias the next cycle. */
+async function loadFeedbackTags(supabase: SupabaseClient, userId: string): Promise<FeedbackTags> {
+  const { data, error } = await supabase
+    .from("feedback")
+    .select("signal, repos(languages, topics)")
+    .eq("user_id", userId)
+    .in("signal", ["up", "down"]);
+
+  if (error) throw new Error(`Failed to load feedback tags: ${error.message}`);
+
+  const liked: string[] = [];
+  const disliked: string[] = [];
+
+  for (const row of data ?? []) {
+    const repo = Array.isArray(row.repos) ? row.repos[0] : row.repos;
+    if (!repo) continue;
+    const tags = [...repo.languages, ...repo.topics];
+    if (row.signal === "up") liked.push(...tags);
+    else disliked.push(...tags);
+  }
+
+  return { liked, disliked };
 }
 
 /** FR-3.1-3.4: runs one match cycle for a single user against the current candidate corpus. */
@@ -106,7 +135,23 @@ export async function matchCycleForUser(
     hasContributing: repo.has_contributing,
   }));
 
-  const matches = rankMatches(profile, candidateRepos, TOP_N);
+  const feedbackTags = await loadFeedbackTags(supabase, user.id);
+
+  // FR-3.1-3.4 base score, adjusted per FR-5.4 by the user's accumulated up/down feedback
+  const matches = candidateRepos
+    .filter((repo) => isEligible(profile, repo.repoId))
+    .map((repo) => {
+      const base = scoreRepo(profile, repo);
+      const adjustment = computeFeedbackAdjustment(
+        [...repo.languages, ...repo.topics],
+        feedbackTags.liked,
+        feedbackTags.disliked,
+      );
+      return { ...base, score: base.score + adjustment };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, TOP_N);
+
   if (matches.length === 0) return;
 
   const rows = matches.map((match, index) => ({
