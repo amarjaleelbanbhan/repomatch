@@ -31,6 +31,11 @@ export default async function DashboardPage() {
   return (
     <main>
       <h1>Welcome, {profile.username}</h1>
+      <p>
+        <a className="btn" href="/matches">
+          View your matches
+        </a>
+      </p>
 
       <section>
         <h2>Your widget snippet</h2>
