@@ -6,7 +6,8 @@ export const config = { runtime: "edge" };
 
 function parseCount(value: string | null): number {
   const n = Number(value);
-  if (!Number.isInteger(n) || n < 1 || n > 5) return 3;
+  // FR-4.1: default 1 (activity stats are the primary content; this is the secondary "next repo to try" rec)
+  if (!Number.isInteger(n) || n < 1 || n > 5) return 1;
   return n;
 }
 
