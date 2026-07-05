@@ -11,6 +11,7 @@ function makeNode(overrides: Partial<Parameters<typeof isEligibleRepo>[0]> = {})
     stargazerCount: 100,
     forkCount: 10,
     issues: { totalCount: 5 },
+    gfi: { totalCount: 2 },
     isArchived: false,
     isFork: false,
     pushedAt: new Date().toISOString(),
@@ -49,6 +50,7 @@ describe("mapToIndexedRepo", () => {
     expect(result.languages).toEqual(["TypeScript"]);
     expect(result.topics).toEqual(["cli"]);
     expect(result.hasContributing).toBe(true);
+    expect(result.gfiCount).toBe(2);
     expect(result.healthScore).toBeGreaterThan(0);
   });
 

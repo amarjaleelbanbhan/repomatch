@@ -31,6 +31,7 @@ const SEARCH_QUERY = `
           stargazerCount
           forkCount
           issues(states: OPEN) { totalCount }
+          gfi: issues(states: OPEN, labels: ["good first issue"]) { totalCount }
           isArchived
           isFork
           pushedAt
@@ -50,6 +51,7 @@ interface RawRepoNode {
   stargazerCount: number;
   forkCount: number;
   issues: { totalCount: number };
+  gfi: { totalCount: number };
   isArchived: boolean;
   isFork: boolean;
   pushedAt: string | null;
@@ -69,6 +71,7 @@ export interface IndexedRepo {
   stars: number;
   forks: number;
   openIssues: number;
+  gfiCount: number;
   hasContributing: boolean;
   healthScore: number;
   lastCommitAt: string | null;
@@ -99,6 +102,7 @@ export function mapToIndexedRepo(node: RawRepoNode, now: Date): IndexedRepo {
     stars: node.stargazerCount,
     forks: node.forkCount,
     openIssues: node.issues.totalCount,
+    gfiCount: node.gfi.totalCount,
     hasContributing: node.contributing !== null,
     healthScore: computeHealthScore({
       daysSincePush,

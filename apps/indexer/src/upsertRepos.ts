@@ -14,6 +14,7 @@ export async function upsertRepos(supabase: SupabaseClient, repos: IndexedRepo[]
     stars: repo.stars,
     forks: repo.forks,
     open_issues: repo.openIssues,
+    gfi_count: repo.gfiCount,
     has_contributing: repo.hasContributing,
     health_score: repo.healthScore,
     last_commit_at: repo.lastCommitAt,

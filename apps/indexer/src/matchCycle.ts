@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { computeFeedbackAdjustment, isEligible, scoreRepo } from "@repomatch/matcher";
+import { computeFeedbackAdjustment, computeSkillAdjustment, isEligible, scoreRepo } from "@repomatch/matcher";
 import type { CandidateRepo, SkillLevel, UserProfile } from "@repomatch/matcher";
 import { fetchUserStats } from "./userStats.js";
 
@@ -142,12 +142,17 @@ export async function matchCycleForUser(
     .filter((repo) => isEligible(profile, repo.repoId))
     .map((repo) => {
       const base = scoreRepo(profile, repo);
-      const adjustment = computeFeedbackAdjustment(
+      const feedbackAdjustment = computeFeedbackAdjustment(
         [...repo.languages, ...repo.topics],
         feedbackTags.liked,
         feedbackTags.disliked,
       );
-      return { ...base, score: base.score + adjustment };
+      const skillAdjustment = computeSkillAdjustment(
+        user.skill_level,
+        repo.hasGoodFirstIssues,
+        repo.hasContributing,
+      );
+      return { ...base, score: base.score + feedbackAdjustment + skillAdjustment };
     })
     .sort((a, b) => b.score - a.score)
     .slice(0, TOP_N);
