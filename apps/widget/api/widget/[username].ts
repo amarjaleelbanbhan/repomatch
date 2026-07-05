@@ -1,18 +1,65 @@
+import { createClient } from "@supabase/supabase-js";
+import { getThemeColors, resolveTheme } from "../../lib/theme.js";
+import { renderSetupCardSvg, renderWidgetSvg, type RepoCard } from "../../lib/svg.js";
+
 export const config = { runtime: "edge" };
 
-function fallbackSvg(username: string): string {
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="120" viewBox="0 0 400 120">
-  <rect width="400" height="120" rx="8" fill="#0d1117" />
-  <text x="20" y="45" fill="#c9d1d9" font-family="sans-serif" font-size="16">RepoMatch</text>
-  <text x="20" y="75" fill="#8b949e" font-family="sans-serif" font-size="13">Set up matches for @${username} at repomatch.dev</text>
-</svg>`;
+function parseCount(value: string | null): number {
+  const n = Number(value);
+  if (!Number.isInteger(n) || n < 1 || n > 5) return 3;
+  return n;
 }
 
-export default function handler(request: Request): Response {
+async function fetchTopMatches(username: string, count: number): Promise<RepoCard[]> {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return [];
+
+  // FR-4.5: this reads pre-computed Supabase data only; the GitHub API is never called on this path.
+  const supabase = createClient(url, key, { auth: { persistSession: false } });
+
+  const { data: user } = await supabase
+    .from("users")
+    .select("id")
+    .eq("username", username)
+    .maybeSingle();
+
+  if (!user) return [];
+
+  const { data: recs } = await supabase
+    .from("recommendations")
+    .select("reason, rank, repos(full_name, languages, stars)")
+    .eq("user_id", user.id)
+    .order("cycle_ts", { ascending: false })
+    .order("rank", { ascending: true })
+    .limit(count);
+
+  if (!recs || recs.length === 0) return [];
+
+  return recs
+    .map((rec): RepoCard | null => {
+      const repo = Array.isArray(rec.repos) ? rec.repos[0] : rec.repos;
+      if (!repo) return null;
+      return {
+        fullName: repo.full_name,
+        description: "",
+        primaryLanguage: repo.languages?.[0] ?? "",
+        stars: repo.stars ?? 0,
+        reason: rec.reason,
+      };
+    })
+    .filter((card): card is RepoCard => card !== null);
+}
+
+export default async function handler(request: Request): Promise<Response> {
   const url = new URL(request.url);
   const username = url.pathname.split("/").pop()?.replace(/\.svg$/, "") ?? "";
+  const count = parseCount(url.searchParams.get("count"));
+  const theme = resolveTheme(url.searchParams.get("theme"));
+  const colors = getThemeColors(theme);
 
-  const svg = fallbackSvg(username);
+  const cards = await fetchTopMatches(username, count);
+  const svg = cards.length > 0 ? renderWidgetSvg(cards, colors) : renderSetupCardSvg(username, colors);
 
   return new Response(svg, {
     status: 200,
