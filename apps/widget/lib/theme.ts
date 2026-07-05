@@ -5,30 +5,34 @@ export interface ThemeColors {
   cardBorder: string;
   title: string;
   subtitle: string;
+  accent: string;
   reason: string;
 }
 
 const THEMES: Record<Theme, ThemeColors> = {
   dark: {
     background: "#0d1117",
-    cardBorder: "#30363d",
-    title: "#c9d1d9",
-    subtitle: "#8b949e",
-    reason: "#58a6ff",
+    cardBorder: "#21262d",
+    title: "#00d9ff",
+    subtitle: "#8b98a9",
+    accent: "#00ffa3",
+    reason: "#a78bfa",
   },
   light: {
     background: "#ffffff",
     cardBorder: "#d0d7de",
-    title: "#24292f",
+    title: "#0f172a",
     subtitle: "#57606a",
-    reason: "#0969da",
+    accent: "#0e7490",
+    reason: "#6d28d9",
   },
   transparent: {
     background: "none",
-    cardBorder: "#8b949e",
-    title: "#24292f",
+    cardBorder: "#8b98a9",
+    title: "#0f172a",
     subtitle: "#57606a",
-    reason: "#0969da",
+    accent: "#0e7490",
+    reason: "#6d28d9",
   },
 };
 
