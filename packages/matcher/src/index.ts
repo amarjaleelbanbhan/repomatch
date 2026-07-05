@@ -5,3 +5,4 @@ export * from "./stats.js";
 export * from "./feedback.js";
 export * from "./skill.js";
 export * from "./claimed.js";
+export * from "./similarity.js";
