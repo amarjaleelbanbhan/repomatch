@@ -26,7 +26,7 @@ export default async function DashboardPage() {
   }
 
   const widgetBaseUrl = process.env.NEXT_PUBLIC_WIDGET_BASE_URL ?? "https://repomatch-widget-kappa.vercel.app";
-  const snippet = `[![RepoMatch](${widgetBaseUrl}/api/widget/${profile.username}.svg)](https://repomatch-web.vercel.app)`;
+  const snippet = `[![RepoMatch](${widgetBaseUrl}/api/widget/${profile.username}.svg)](https://repomatch-web.vercel.app/u/${profile.username})`;
 
   return (
     <main>
