@@ -17,13 +17,17 @@ export default async function HomePage() {
         {user ? (
           <>
             <p>Signed in as {user.user_metadata.user_name ?? user.email}</p>
-            <a href="/dashboard">Go to dashboard</a>
-            <form action="/auth/signout" method="post">
+            <a className="btn" href="/dashboard">
+              Go to dashboard
+            </a>{" "}
+            <form action="/auth/signout" method="post" style={{ display: "inline" }}>
               <button type="submit">Sign out</button>
             </form>
           </>
         ) : (
-          <a href="/login">Sign in with GitHub</a>
+          <a className="btn" href="/login">
+            Sign in with GitHub
+          </a>
         )}
         <p>
           <a href="https://github.com/amarjaleelbanbhan/repomatch">Open source on GitHub</a> · MIT

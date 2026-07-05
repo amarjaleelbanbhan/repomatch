@@ -18,7 +18,9 @@ export default function LoginPage() {
   return (
     <main>
       <h1>Sign in to RepoMatch</h1>
-      <button onClick={signInWithGitHub}>Sign in with GitHub</button>
+      <button className="btn" onClick={signInWithGitHub}>
+        Sign in with GitHub
+      </button>
     </main>
   );
 }

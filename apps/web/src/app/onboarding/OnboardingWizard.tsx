@@ -51,10 +51,11 @@ export function OnboardingWizard({ suggestedLanguages, suggestedTopics, initialS
         <section>
           <h2>Step 1 of 3 — Pick 3 to 10 interests</h2>
           <p>Detected from your public repos and stars. Add or remove as you like.</p>
-          <div>
+          <div className="badges">
             {topicOptions.map((topic) => (
               <button
                 type="button"
+                className="chip"
                 key={topic}
                 aria-pressed={topics.includes(topic)}
                 onClick={() => setTopics((t) => toggle(t, topic))}

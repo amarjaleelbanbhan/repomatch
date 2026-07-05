@@ -31,15 +31,37 @@ export default async function DashboardPage() {
   return (
     <main>
       <h1>Welcome, {profile.username}</h1>
-      <p>Add this to your GitHub profile README:</p>
-      <pre>{snippet}</pre>
 
-      <p>Interests: {profile.topics.join(", ")} · Skill level: {profile.skill_level}</p>
-      <a href="/onboarding">Edit interests</a>
+      <section>
+        <h2>Your widget snippet</h2>
+        <p>Add this to your GitHub profile README:</p>
+        <pre>{snippet}</pre>
+      </section>
 
-      <form action={deleteAccount}>
-        <button type="submit">Delete my account</button>
-      </form>
+      <section>
+        <h2>Your profile</h2>
+        <div className="badges">
+          {profile.topics.map((topic) => (
+            <span className="chip" key={topic}>
+              {topic}
+            </span>
+          ))}
+        </div>
+        <p>Skill level: {profile.skill_level}</p>
+        <a className="btn" href="/onboarding">
+          Edit interests
+        </a>
+      </section>
+
+      <section>
+        <h2>Danger zone</h2>
+        <p>Deletes your account and all associated data immediately.</p>
+        <form action={deleteAccount}>
+          <button type="submit" className="btn-danger">
+            Delete my account
+          </button>
+        </form>
+      </section>
     </main>
   );
 }
