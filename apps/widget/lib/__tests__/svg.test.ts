@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { escapeXml, renderActivityCardSvg, renderSetupCardSvg, renderWidgetSvg } from "../svg.js";
+import { escapeXml, renderActivityCardSvg, renderMyWorkSvg, renderSetupCardSvg, renderWidgetSvg } from "../svg.js";
 import { getThemeColors } from "../theme.js";
 
 describe("escapeXml", () => {
@@ -64,5 +64,24 @@ describe("renderActivityCardSvg", () => {
       getThemeColors("dark"),
     );
     expect(svg).not.toContain("<script>alert");
+  });
+});
+
+describe("renderMyWorkSvg", () => {
+  it("renders a fallback when the user has no claimed repos", () => {
+    const svg = renderMyWorkSvg([], "octocat", getThemeColors("dark"));
+    expect(svg).toContain("hasn't claimed any repos");
+    expect(new TextEncoder().encode(svg).length).toBeLessThan(15 * 1024);
+  });
+
+  it("renders one card per claimed repo with pitch and help-wanted areas", () => {
+    const svg = renderMyWorkSvg(
+      [{ fullName: "octocat/hello", pitch: "Come build with us", helpWanted: ["docs", "tests"] }],
+      "octocat",
+      getThemeColors("light"),
+    );
+    expect(svg).toContain("Contributors wanted");
+    expect(svg.match(/<g /g)).toHaveLength(1);
+    expect(new TextEncoder().encode(svg).length).toBeLessThan(15 * 1024);
   });
 });

@@ -15,6 +15,12 @@ export interface ActivityStats {
   topLanguages: string[];
 }
 
+export interface MyWorkCard {
+  fullName: string;
+  pitch: string;
+  helpWanted: string[];
+}
+
 const CARD_HEIGHT = 60;
 const CARD_WIDTH = 420;
 const PADDING = 16;
@@ -118,6 +124,39 @@ export function renderActivityCardSvg(
   <text x="${PADDING}" y="34" fill="${colors.title}" font-family="${FONT}" font-size="19" font-weight="700">${escapeXml(streakText)}</text>
   <text x="${PADDING}" y="56" fill="${colors.subtitle}" font-family="${FONT}" font-size="12">${escapeXml(statsLine)}</text>
   <text x="${PADDING}" y="74" fill="${colors.accent}" font-family="${FONT}" font-size="12">${escapeXml(languagesLine)}</text>${recMarkup}
+  ${brandTag(colors, height)}
+</svg>`;
+}
+
+function myWorkCardGroup(card: MyWorkCard, y: number, colors: ThemeColors): string {
+  const helpWantedLine = card.helpWanted.length > 0 ? `Help wanted: ${card.helpWanted.join(", ")}` : "";
+  return `
+  <g transform="translate(0, ${y})">
+    <rect x="${PADDING}" y="0" width="${CARD_WIDTH - PADDING * 2}" height="${CARD_HEIGHT - 8}" rx="8" fill="none" stroke="${colors.cardBorder}" />
+    <text x="${PADDING + 12}" y="20" fill="${colors.title}" font-family="${FONT}" font-size="14" font-weight="600">${escapeXml(truncate(card.fullName, 40))}</text>
+    <text x="${PADDING + 12}" y="38" fill="${colors.subtitle}" font-family="${FONT}" font-size="12">${escapeXml(truncate(card.pitch, 55))}</text>
+    <text x="${CARD_WIDTH - PADDING - 12}" y="38" fill="${colors.accent}" font-family="${FONT}" font-size="11" text-anchor="end">${escapeXml(truncate(helpWantedLine, 35))}</text>
+  </g>`;
+}
+
+/** FR-4.7: `?type=mywork` — the user's claimed repos, pitched to attract contributors. */
+export function renderMyWorkSvg(cards: MyWorkCard[], username: string, colors: ThemeColors): string {
+  if (cards.length === 0) {
+    const height = 90;
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${CARD_WIDTH}" height="${height}" viewBox="0 0 ${CARD_WIDTH} ${height}">
+  ${defs(colors)}${frame(colors, height)}
+  <text x="${PADDING}" y="40" fill="${colors.title}" font-family="${FONT}" font-size="16" font-weight="700">⚡ RepoMatch</text>
+  <text x="${PADDING}" y="64" fill="${colors.subtitle}" font-family="${FONT}" font-size="13">@${escapeXml(username)} hasn't claimed any repos yet</text>
+</svg>`;
+  }
+
+  const headerHeight = 40;
+  const height = headerHeight + cards.length * CARD_HEIGHT;
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${CARD_WIDTH}" height="${height}" viewBox="0 0 ${CARD_WIDTH} ${height}">
+  ${defs(colors)}${frame(colors, height)}
+  <text x="${PADDING}" y="28" fill="${colors.title}" font-family="${FONT}" font-size="15" font-weight="700">🤝 Contributors wanted</text>
+  ${cards.map((card, i) => myWorkCardGroup(card, headerHeight + i * CARD_HEIGHT, colors)).join("")}
   ${brandTag(colors, height)}
 </svg>`;
 }

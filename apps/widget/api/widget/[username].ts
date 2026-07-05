@@ -1,6 +1,13 @@
 import { createClient } from "@supabase/supabase-js";
 import { getThemeColors, resolveTheme } from "../../lib/theme.js";
-import { renderActivityCardSvg, renderSetupCardSvg, type ActivityStats, type RepoCard } from "../../lib/svg.js";
+import {
+  renderActivityCardSvg,
+  renderMyWorkSvg,
+  renderSetupCardSvg,
+  type ActivityStats,
+  type MyWorkCard,
+  type RepoCard,
+} from "../../lib/svg.js";
 
 export const config = { runtime: "edge" };
 
@@ -16,13 +23,17 @@ interface WidgetData {
   nextRepos: RepoCard[];
 }
 
-async function fetchWidgetData(username: string, count: number): Promise<WidgetData | null> {
+function getSupabase() {
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) return null;
-
   // FR-4.5: this reads pre-computed Supabase data only; the GitHub API is never called on this path.
-  const supabase = createClient(url, key, { auth: { persistSession: false } });
+  return createClient(url, key, { auth: { persistSession: false } });
+}
+
+async function fetchWidgetData(username: string, count: number): Promise<WidgetData | null> {
+  const supabase = getSupabase();
+  if (!supabase) return null;
 
   const { data: user } = await supabase
     .from("users")
@@ -65,17 +76,46 @@ async function fetchWidgetData(username: string, count: number): Promise<WidgetD
   return { stats, nextRepos };
 }
 
+/** FR-4.7: `?type=mywork` variant — the user's claimed repos, pitched to attract contributors. */
+async function fetchMyWork(username: string): Promise<MyWorkCard[] | null> {
+  const supabase = getSupabase();
+  if (!supabase) return null;
+
+  const { data: user } = await supabase.from("users").select("id").eq("username", username).maybeSingle();
+  if (!user) return null;
+
+  const { data: claims } = await supabase
+    .from("claims")
+    .select("pitch, help_wanted, repos(full_name)")
+    .eq("maintainer_user_id", user.id);
+
+  return (claims ?? [])
+    .map((claim): MyWorkCard | null => {
+      const repo = Array.isArray(claim.repos) ? claim.repos[0] : claim.repos;
+      if (!repo) return null;
+      return { fullName: repo.full_name, pitch: claim.pitch ?? "", helpWanted: claim.help_wanted };
+    })
+    .filter((card): card is MyWorkCard => card !== null);
+}
+
 export default async function handler(request: Request): Promise<Response> {
   const url = new URL(request.url);
   const username = url.pathname.split("/").pop()?.replace(/\.svg$/, "") ?? "";
   const count = parseCount(url.searchParams.get("count"));
   const theme = resolveTheme(url.searchParams.get("theme"));
   const colors = getThemeColors(theme);
+  const type = url.searchParams.get("type");
 
-  const data = await fetchWidgetData(username, count);
-  const svg = data
-    ? renderActivityCardSvg(data.stats, data.nextRepos, colors)
-    : renderSetupCardSvg(username, colors);
+  let svg: string;
+  if (type === "mywork") {
+    const cards = await fetchMyWork(username);
+    svg = cards !== null ? renderMyWorkSvg(cards, username, colors) : renderSetupCardSvg(username, colors);
+  } else {
+    const data = await fetchWidgetData(username, count);
+    svg = data
+      ? renderActivityCardSvg(data.stats, data.nextRepos, colors)
+      : renderSetupCardSvg(username, colors);
+  }
 
   return new Response(svg, {
     status: 200,
