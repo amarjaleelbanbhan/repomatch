@@ -205,33 +205,42 @@ export type Database = {
       }
       users: {
         Row: {
+          contribution_streak: number
           created_at: string
           github_id: number
           id: string
           languages: string[]
+          last_active_at: string | null
           locale: string
           skill_level: Database["public"]["Enums"]["skill_level"]
           topics: string[]
+          total_contributions: number
           username: string
         }
         Insert: {
+          contribution_streak?: number
           created_at?: string
           github_id: number
           id: string
           languages?: string[]
+          last_active_at?: string | null
           locale?: string
           skill_level?: Database["public"]["Enums"]["skill_level"]
           topics?: string[]
+          total_contributions?: number
           username: string
         }
         Update: {
+          contribution_streak?: number
           created_at?: string
           github_id?: number
           id?: string
           languages?: string[]
+          last_active_at?: string | null
           locale?: string
           skill_level?: Database["public"]["Enums"]["skill_level"]
           topics?: string[]
+          total_contributions?: number
           username?: string
         }
         Relationships: []

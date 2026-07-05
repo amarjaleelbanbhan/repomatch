@@ -92,28 +92,38 @@ Human tasks (not Claude Code):
 
 ### PHASE 1 — MVP Widget: Core Value (Weight: 40%) — Weeks 2–4
 
-**New feature: personalized repo suggestions in README widget.**
+**New feature: OSS Activity Card — installer's own stats first, recommendation secondary.**
+
+> Pivot (2026-07-06): the original widget was other-facing (visitor benefit, not installer benefit) —
+> weak install incentive, cold-start problem. The widget now leads with the installer's own
+> contribution stats so it has value on day 1, independent of match quality. See SRS FR-4.8–4.11, NFR-12.
 
 Claude Code tasks:
 1. **Repo indexer** (GitHub Action, nightly):
    - GraphQL batch fetch: repos matching user languages/topics, filters: pushed within 30 days, >10 stars, has open issues, not archived
    - Health score (borrow ReadmeCodeGen logic): recency 40% + open issues 25% + stars/forks 20% + not-archived 15%
+   - Same batch call also computes each user's contribution streak, total contributions, top languages, and total stars across owned repos (no extra rate-limit cost) — written to `users.contribution_streak` / `total_contributions` / `last_active_at`
 2. **Matcher v1** (`packages/matcher`, pure SQL/TS — no ML yet):
    - Score = language overlap (40%) + topic overlap (30%) + starred-repo similarity (20%) + health (10%)
-   - Top 3 repos per user, exclude already-starred/owned
-3. **SVG widget v1:**
-   - 3 repo cards: name, 1-line desc, language dot, stars, "why matched" tag (e.g., `matched: python + ml`)
+   - Top 1 repo surfaced in the widget as "Next repo to try" (dashboard still shows the full top-N list), exclude already-starred/owned
+3. **SVG widget v1 — OSS Activity Card:**
+   - Primary content: contribution streak, total contributions, top languages, total stars across owned repos
+   - Secondary content: 1 recommended repo card, name, 1-line desc, language dot, stars, "why matched" tag (e.g., `matched: python + ml`), labeled "Next repo to try"
+   - Must render the activity card even when the matcher returns zero recommendations (graceful degradation, FR-4.11)
    - Themes: dark/light/transparent (URL param)
    - Whole widget = 1 link → user's page on our site (SVG camo limitation)
 4. **Onboarding flow (web):**
    - Login → pick 3–5 interests (chips UI) → skill level → copy-paste markdown snippet
    - Auto-detect languages from their repos, pre-fill
+   - Copy: "show your OSS activity + get your next repo" (not "get repo recommendations") — value is front-loaded, stats render immediately post-OAuth, before the matcher even runs
 5. **Caching:**
    - Upstash: SVG string, key `widget:{username}`, TTL 24h
    - Nightly Action busts + regenerates for all users
 6. **Landing page:** demo widget, 3-step setup, open-source badge
 
-**Exit criteria:** 50 users with widget live, manual quality check on all 50 (recs must be genuinely good — this is THE make-or-break).
+**Exit criteria:** stats card renders correctly for 50 users; recs directionally reasonable (lower bar than before — activity stats carry the widget's value even while match quality is still maturing).
+
+**Distribution note (human task, not Claude Code):** don't rely solely on README virality for the first cohort. Seed via student communities/hackathons to reach the first 50–200 users manually.
 
 ---
 
@@ -205,7 +215,7 @@ Claude Code tasks:
 | Phase | Metric |
 |---|---|
 | 0 | OAuth + static widget live |
-| 1 | 50 widgets live, quality-checked |
+| 1 | 50 activity-card widgets live, stats verified, recs directionally reasonable |
 | 2 | 👍 >60%, 200 users |
 | 3 | 500 users, 20 claimed repos |
 | 4 | Week-over-week organic signup growth |

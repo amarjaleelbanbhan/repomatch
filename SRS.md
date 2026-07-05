@@ -118,13 +118,17 @@ Priority: **M** = Must (MVP), **S** = Should (post-MVP), **C** = Could (later).
 ### FR-4 Widget (SVG)
 | ID | Requirement | Pri |
 |---|---|---|
-| FR-4.1 | Endpoint `GET /api/widget/{username}.svg` shall return the user's current top matches (default 3, param `count` 1–5) as a styled SVG card set | M |
+| FR-4.1 | Endpoint `GET /api/widget/{username}.svg` shall return the user's current top matches (default 1, param `count` 1–5) as a styled SVG card set, rendered below the OSS Activity Card per FR-4.8 | M |
 | FR-4.2 | Each card shall display: repo name, one-line description, primary language indicator, star count, match reason | M |
 | FR-4.3 | Themes: dark, light, transparent, selectable via URL parameter | M |
 | FR-4.4 | The widget shall link to the user's public match page on the platform (single-link constraint per §2.3) | M |
 | FR-4.5 | Serving path: Upstash cache (24h TTL) → Supabase fallback → generic "setup" card for unknown users; GitHub API shall never be called in this path | M |
 | FR-4.6 | Response: `Cache-Control: max-age=86400`, payload ≤15 KB, p95 latency ≤300 ms cache-hit | M |
 | FR-4.7 | Additional widget variant `type=mywork` (user's projects + "contributors wanted") | S |
+| FR-4.8 | The widget's primary content shall be an OSS Activity Card showing the installer's own contribution streak, total contributions, top languages used, and total stars across owned repos | M |
+| FR-4.9 | The widget shall render exactly 1 recommended repo as secondary content beneath the activity card, labeled "Next repo to try" | M |
+| FR-4.10 | Activity Card stats shall be computed nightly via the same GitHub GraphQL batch job used for repo indexing (no additional live API calls) and cached with 24h TTL alongside recommendation data | M |
+| FR-4.11 | The widget shall render the Activity Card even when the recommendation engine returns zero matches for the user (graceful degradation — activity stats must never depend on matcher success) | M |
 
 ### FR-5 Web Dashboard
 | ID | Requirement | Pri |
@@ -169,13 +173,14 @@ Priority: **M** = Must (MVP), **S** = Should (post-MVP), **C** = Could (later).
 | NFR-9 | Accessibility | Web app WCAG 2.1 AA; widget text contrast ≥4.5:1 in all themes |
 | NFR-10 | Localization | All user-facing strings externalized; RTL-safe layout (Urdu, Arabic); CJK-safe rendering (Chinese) |
 | NFR-11 | Observability | Structured logs; nightly-job success/failure alerting; public status of last cycle timestamp |
+| NFR-12 | Cold-start resilience | Widget value must be visible to the installer without requiring recommendation quality (activity stats decouple install incentive from matcher accuracy) |
 
 ---
 
 ## 5. Data Requirements
 
 ### 5.1 Logical Model (principal entities)
-- **users**(id, github_id, username, languages[], topics[], skill_level, locale, created_at)
+- **users**(id, github_id, username, languages[], topics[], skill_level, locale, contribution_streak, total_contributions, last_active_at, created_at)
 - **repos**(id, github_id, full_name, description, summary_en, summary_ur, languages[], topics[], stars, forks, open_issues, gfi_count, has_contributing, health_score, embedding vector, last_commit_at, indexed_at)
 - **recommendations**(user_id, repo_id, score, reason, rank, cycle_ts) — unique(user_id, repo_id, cycle_ts)
 - **feedback**(user_id, repo_id, signal ∈ {up, down, known, hide, swipe_r, swipe_l}, ts)

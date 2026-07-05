@@ -9,7 +9,7 @@ export default async function HomePage() {
   return (
     <main>
       <h1>RepoMatch</h1>
-      <p>Personalized open-source repo recommendations, delivered via a widget in your GitHub README.</p>
+      <p>Show your OSS activity and get your next repo to try, right in your GitHub README.</p>
       {user ? (
         <>
           <p>Signed in as {user.user_metadata.user_name ?? user.email}</p>

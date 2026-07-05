@@ -13,7 +13,7 @@ Code = 20% of effort. Users + feedback + distribution = 80%.
 ## MONTH 1 — Ship Everything Core (old Phases 0–2 compressed)
 
 **Week 1:** Monorepo, Supabase schema, OAuth, static SVG live in a real README.
-**Week 2:** Repo indexer (GitHub Actions + GraphQL), matcher v1 (language/topic/health scoring), widget v1 with 3 recs, onboarding flow, Upstash caching, landing page. SHIP.
+**Week 2:** Repo indexer (GitHub Actions + GraphQL, also computes contribution stats), matcher v1 (language/topic/health scoring), widget v1 as an OSS Activity Card (own stats primary + 1 rec secondary), onboarding flow, Upstash caching, landing page. SHIP.
 **Week 3:** pgvector + HF embeddings, semantic matcher v2, 👍/👎 feedback loop, web dashboard with filters.
 **Week 4:** Plain-English/Urdu repo summaries, widget themes/params, SEO explore pages, browser extension MVP. 
 **Parallel (human, non-compressible):** 15 user interviews, recruit first 50 users by hand, manual quality check on every recommendation set.
