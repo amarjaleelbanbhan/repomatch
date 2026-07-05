@@ -40,6 +40,9 @@ export default async function DashboardPage() {
         </a>{" "}
         <a className="btn" href="/people">
           Developers like you
+        </a>{" "}
+        <a className="btn" href="/network">
+          Your network's repos
         </a>
       </p>
 
