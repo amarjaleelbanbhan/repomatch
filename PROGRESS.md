@@ -31,20 +31,16 @@
 
 ## Phase 1 — MVP Widget: OSS Activity Card
 
-- [x] Nightly repo indexer: GraphQL batch search, health scoring, upsert + prune (FR-2.1–2.4) — **code complete, not yet run live** (blocked on `INDEXER_GITHUB_PAT` + `SUPABASE_SERVICE_ROLE_KEY` repo secrets)
-- [x] User stats + match cycle job: contribution streak/total/owned stars, matcher v1 scoring, writes recommendations (FR-3.1–3.4, FR-4.8–4.10) — **code complete, same blocker as above**
-- [x] OSS Activity Card widget rendering: streak, contributions, stars, top languages, 1 "next repo to try" card, graceful degradation to zero-state (FR-4.8–4.11) — **verified live**
-- [x] Onboarding flow: auto-detected interests (FR-1.2), 3-step wizard (FR-1.3–1.4), edit + account deletion (FR-1.5) — **code complete, live interest-detection needs `GITHUB_PAT` set on the `repomatch-web` Vercel project**
+- [x] Nightly repo indexer: GraphQL batch search, health scoring, upsert + prune (FR-2.1–2.4) — **verified live**: first run indexed 567 eligible repos
+- [x] User stats + match cycle job: contribution streak/total/owned stars, matcher v1 scoring, writes recommendations (FR-3.1–3.4, FR-4.8–4.10) — **verified live**: real user now shows 6-day streak, 457 contributions, 18 owned stars, 10 recommendations written
+- [x] OSS Activity Card widget rendering: streak, contributions, stars, top languages, 1 "next repo to try" card, graceful degradation to zero-state (FR-4.8–4.11) — **verified live** with real (non-zero) data end-to-end
+- [x] Onboarding flow: auto-detected interests (FR-1.2), 3-step wizard (FR-1.3–1.4), edit + account deletion (FR-1.5) — **code complete**; `GITHUB_PAT` set on `repomatch-web` Vercel env, live interest-detection not yet manually verified through the actual wizard UI
 - [ ] Upstash widget caching (24h TTL, `widget:{username}` key) — **not started**, needs an Upstash account (new signup, not yet requested from user)
 - [x] Landing page: live demo widget, 3-step setup, open-source badge
 
-**Blocked on (waiting for user):**
-1. Fine-grained GitHub PAT → sets `INDEXER_GITHUB_PAT` (Actions secret) + `GITHUB_PAT` (Vercel env on `repomatch-web`)
-2. Supabase `service_role` key → sets `SUPABASE_SERVICE_ROLE_KEY` (Actions secret) + same on `repomatch-web` Vercel env (widget project already has it)
+**Secrets wired:** `INDEXER_GITHUB_PAT`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (GitHub Actions repo secrets) + `GITHUB_PAT`, `SUPABASE_SERVICE_ROLE_KEY` (repomatch-web Vercel env). Nightly indexer runs on cron `17 3 * * *` UTC and via manual `workflow_dispatch`.
 
-Once both are in hand: wire secrets, trigger a manual indexer run (`workflow_dispatch`), verify a real user's widget shows non-zero stats + a rec.
-
-**Exit criteria (not yet met):** stats card renders correctly for 50 users; recs directionally reasonable.
+**Exit criteria (not yet met):** stats card renders correctly for 50 users; recs directionally reasonable. Currently verified for 1 real user (the platform's own first signup).
 
 ## Phase 2 — Smart Matching + Dashboard — not started
 
