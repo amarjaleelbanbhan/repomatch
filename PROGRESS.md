@@ -5,7 +5,7 @@
 
 **Live:**
 - Web app: https://repomatch-web.vercel.app
-- Widget: https://repomatch-widget.vercel.app/api/widget/{username}.svg
+- Widget: https://repomatch-widget-kappa.vercel.app/api/widget/{username}.svg
 - Repo: https://github.com/amarjaleelbanbhan/repomatch
 
 ---

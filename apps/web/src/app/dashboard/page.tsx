@@ -25,7 +25,8 @@ export default async function DashboardPage() {
     redirect("/onboarding");
   }
 
-  const snippet = `[![RepoMatch](https://repomatch-widget.vercel.app/api/widget/${profile.username}.svg)](https://repomatch-web.vercel.app)`;
+  const widgetBaseUrl = process.env.NEXT_PUBLIC_WIDGET_BASE_URL ?? "https://repomatch-widget-kappa.vercel.app";
+  const snippet = `[![RepoMatch](${widgetBaseUrl}/api/widget/${profile.username}.svg)](https://repomatch-web.vercel.app)`;
 
   return (
     <main>

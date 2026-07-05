@@ -7,6 +7,7 @@ export default async function HomePage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  const widgetBaseUrl = process.env.NEXT_PUBLIC_WIDGET_BASE_URL ?? "https://repomatch-widget-kappa.vercel.app";
 
   return (
     <main>
@@ -33,7 +34,7 @@ export default async function HomePage() {
       <section>
         <h2>Live demo</h2>
         <img
-          src={`https://repomatch-widget.vercel.app/api/widget/${DEMO_USERNAME}.svg`}
+          src={`${widgetBaseUrl}/api/widget/${DEMO_USERNAME}.svg`}
           alt="RepoMatch widget demo"
           width={420}
         />

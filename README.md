@@ -30,12 +30,12 @@ the widget's own visitors are the platform's growth loop.
 Embed one line of markdown in your `README.md`:
 
 ```md
-[![RepoMatch](https://repomatch-widget.vercel.app/api/widget/YOUR_USERNAME.svg)](https://repomatch-web.vercel.app/u/YOUR_USERNAME)
+[![RepoMatch](https://repomatch-widget-kappa.vercel.app/api/widget/YOUR_USERNAME.svg)](https://repomatch-web.vercel.app/u/YOUR_USERNAME)
 ```
 
 Live example (renders a "not set up yet" fallback until you've signed in at least once):
 
-[![RepoMatch](https://repomatch-widget.vercel.app/api/widget/octocat.svg)](https://repomatch-web.vercel.app)
+[![RepoMatch](https://repomatch-widget-kappa.vercel.app/api/widget/octocat.svg)](https://repomatch-web.vercel.app)
 
 Query parameters:
 
@@ -131,6 +131,7 @@ RepoMatch ships in phases, each ending with a real deploy. See:
 - [PROJECT_PLAN.md](PROJECT_PLAN.md) — phase-by-phase architecture and scope
 - [ROADMAP_6MONTH.md](ROADMAP_6MONTH.md) — the 6-month, AI-speed timeline
 - [SRS.md](SRS.md) — the requirements (FR/NFR) everything is built against
+- [PROGRESS.md](PROGRESS.md) — living checklist of what's shipped vs. remaining
 
 Currently shipping: **Phase 1 — MVP Widget** (OSS Activity Card + nightly indexer + matcher v1).
 
