@@ -1,5 +1,11 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { computeFeedbackAdjustment, computeSkillAdjustment, isEligible, scoreRepo } from "@repomatch/matcher";
+import {
+  computeClaimedBoost,
+  computeFeedbackAdjustment,
+  computeSkillAdjustment,
+  isEligible,
+  scoreRepo,
+} from "@repomatch/matcher";
 import type { CandidateRepo, SkillLevel, UserProfile } from "@repomatch/matcher";
 import { fetchUserStats } from "./userStats.js";
 
@@ -21,6 +27,7 @@ interface RepoRow {
   health_score: number;
   gfi_count: number;
   has_contributing: boolean;
+  isClaimed: boolean;
 }
 
 async function loadCandidateRepos(supabase: SupabaseClient): Promise<RepoRow[]> {
@@ -28,9 +35,13 @@ async function loadCandidateRepos(supabase: SupabaseClient): Promise<RepoRow[]> 
     .from("repos")
     .select("id, full_name, languages, topics, health_score, gfi_count, has_contributing")
     .is("deleted_at", null);
-
   if (error) throw new Error(`Failed to load candidate repos: ${error.message}`);
-  return data ?? [];
+
+  const { data: claimRows, error: claimsError } = await supabase.from("claims").select("repo_id");
+  if (claimsError) throw new Error(`Failed to load claims: ${claimsError.message}`);
+  const claimedRepoIds = new Set((claimRows ?? []).map((c) => c.repo_id));
+
+  return (data ?? []).map((repo) => ({ ...repo, isClaimed: claimedRepoIds.has(repo.id) }));
 }
 
 async function loadHiddenRepoIds(supabase: SupabaseClient, userId: string): Promise<string[]> {
@@ -134,10 +145,11 @@ export async function matchCycleForUser(
     hasGoodFirstIssues: repo.gfi_count > 0,
     hasContributing: repo.has_contributing,
   }));
+  const claimedById = new Map(candidates.map((repo) => [repo.id, repo.isClaimed]));
 
   const feedbackTags = await loadFeedbackTags(supabase, user.id);
 
-  // FR-3.1-3.4 base score, adjusted per FR-5.4 by the user's accumulated up/down feedback
+  // FR-3.1-3.4 base score, adjusted per FR-5.4 (feedback), FR-3.7 (skill), FR-6.3 (claimed repos)
   const matches = candidateRepos
     .filter((repo) => isEligible(profile, repo.repoId))
     .map((repo) => {
@@ -152,7 +164,8 @@ export async function matchCycleForUser(
         repo.hasGoodFirstIssues,
         repo.hasContributing,
       );
-      return { ...base, score: base.score + feedbackAdjustment + skillAdjustment };
+      const claimedBoost = computeClaimedBoost(claimedById.get(repo.repoId) ?? false);
+      return { ...base, score: base.score + feedbackAdjustment + skillAdjustment + claimedBoost };
     })
     .sort((a, b) => b.score - a.score)
     .slice(0, TOP_N);

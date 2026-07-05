@@ -29,19 +29,26 @@ export default async function PublicMatchPage({ params }: Props) {
   let recs: {
     reason: string;
     rank: number;
+    repo_id: string;
     repos: { full_name: string; description: string | null; languages: string[]; stars: number } | null;
   }[] = [];
 
   if (latestCycle) {
     const { data } = await admin
       .from("recommendations")
-      .select("reason, rank, repos(full_name, description, languages, stars)")
+      .select("reason, rank, repo_id, repos(full_name, description, languages, stars)")
       .eq("user_id", profile.id)
       .eq("cycle_ts", latestCycle.cycle_ts)
       .order("rank", { ascending: true })
       .limit(10);
     recs = data ?? [];
   }
+
+  const { data: claimRows } = await admin
+    .from("claims")
+    .select("repo_id")
+    .in("repo_id", recs.map((r) => r.repo_id));
+  const claimedRepoIds = new Set((claimRows ?? []).map((c) => c.repo_id));
 
   return (
     <main>
@@ -59,7 +66,10 @@ export default async function PublicMatchPage({ params }: Props) {
           if (!repo) return null;
           return (
             <div key={repo.full_name}>
-              <h3>{repo.full_name}</h3>
+              <h3>
+                {repo.full_name}{" "}
+                {claimedRepoIds.has(rec.repo_id) && <span className="chip">✓ actively welcoming</span>}
+              </h3>
               <p>{repo.description}</p>
               <p>
                 {repo.languages.join(", ")} · ★ {repo.stars} · {rec.reason}

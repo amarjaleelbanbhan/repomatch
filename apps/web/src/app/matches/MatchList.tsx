@@ -11,6 +11,7 @@ export interface Match {
   stars: number;
   healthScore: number;
   hasContributing: boolean;
+  isClaimed: boolean;
   reason: string;
   rank: number;
   feedback: string | null;
@@ -69,7 +70,9 @@ export function MatchList({ matches }: Props) {
 
       {filtered.map((match) => (
         <section key={match.repoId}>
-          <h2>{match.fullName}</h2>
+          <h2>
+            {match.fullName} {match.isClaimed && <span className="chip">✓ actively welcoming</span>}
+          </h2>
           <p>{match.description || "No description available."}</p>
           <p>
             {match.languages.join(", ")} · ★ {match.stars} · health {match.healthScore.toFixed(0)}

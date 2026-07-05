@@ -52,6 +52,12 @@ export default async function MatchesPage() {
 
   const feedbackByRepo = new Map((feedbackRows ?? []).map((f) => [f.repo_id, f.signal]));
 
+  const { data: claimRows } = await supabase
+    .from("claims")
+    .select("repo_id")
+    .in("repo_id", recs.map((r) => r.repo_id));
+  const claimedRepoIds = new Set((claimRows ?? []).map((c) => c.repo_id));
+
   const matches: Match[] = recs
     .map((rec): Match | null => {
       const repo = Array.isArray(rec.repos) ? rec.repos[0] : rec.repos;
@@ -64,6 +70,7 @@ export default async function MatchesPage() {
         stars: repo.stars,
         healthScore: repo.health_score,
         hasContributing: repo.has_contributing,
+        isClaimed: claimedRepoIds.has(rec.repo_id),
         reason: rec.reason,
         rank: rec.rank,
         feedback: feedbackByRepo.get(rec.repo_id) ?? null,

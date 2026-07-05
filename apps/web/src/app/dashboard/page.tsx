@@ -34,6 +34,9 @@ export default async function DashboardPage() {
       <p>
         <a className="btn" href="/matches">
           View your matches
+        </a>{" "}
+        <a className="btn" href="/claim">
+          Claim a repo you maintain
         </a>
       </p>
 
