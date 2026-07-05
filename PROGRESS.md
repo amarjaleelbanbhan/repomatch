@@ -39,7 +39,7 @@
 - [x] Landing page: live demo widget, 3-step setup, open-source badge
 - [x] Widget visual redesign: tokyonight palette (matches the user's own GitHub profile aesthetic), gradient accent bar, rounded frame — verified live
 - [x] Web app dark-theme styling: globals.css, gradient CTAs, chips, danger-zone button — verified via computed-style inspection
-- [ ] Embed widget in user's GitHub profile README — **blocked on explicit user confirmation** (auto-mode classifier requires an unambiguous "yes, push this" for writes to external public repos; queued, diff prepared)
+- [x] Embed widget in user's GitHub profile README — **live**: [amarjaleelbanbhan/amarjaleelbanbhan](https://github.com/amarjaleelbanbhan/amarjaleelbanbhan/commit/a2e686465d200a2cdfc98dcb6ccca05586b9b3c8), new "🔀 Next Repo to Try" section
 
 **Secrets wired:** `INDEXER_GITHUB_PAT`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (GitHub Actions repo secrets) + `GITHUB_PAT`, `SUPABASE_SERVICE_ROLE_KEY` (repomatch-web Vercel env). Nightly indexer runs on cron `17 3 * * *` UTC and via manual `workflow_dispatch`.
 
