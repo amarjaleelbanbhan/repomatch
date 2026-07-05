@@ -77,8 +77,8 @@ export default async function MatchesPage() {
       };
     })
     .filter((m): m is Match => m !== null)
-    // hidden/known matches stay out of the active list — the feedback is still recorded
-    .filter((m) => m.feedback !== "hide" && m.feedback !== "known");
+    // hidden/known/left-swiped matches stay out of the active list — the feedback is still recorded
+    .filter((m) => m.feedback !== "hide" && m.feedback !== "known" && m.feedback !== "swipe_l");
 
   return (
     <main>

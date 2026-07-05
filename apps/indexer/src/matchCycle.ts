@@ -49,7 +49,8 @@ async function loadHiddenRepoIds(supabase: SupabaseClient, userId: string): Prom
     .from("feedback")
     .select("repo_id")
     .eq("user_id", userId)
-    .eq("signal", "hide");
+    // FR-5.6: a left swipe is equivalent to an explicit hide
+    .in("signal", ["hide", "swipe_l"]);
 
   if (error) throw new Error(`Failed to load hidden feedback: ${error.message}`);
   return (data ?? []).map((row) => row.repo_id);
@@ -66,7 +67,8 @@ async function loadFeedbackTags(supabase: SupabaseClient, userId: string): Promi
     .from("feedback")
     .select("signal, repos(languages, topics)")
     .eq("user_id", userId)
-    .in("signal", ["up", "down"]);
+    // FR-5.6: swipe right/left carry the same weight as explicit up/down votes
+    .in("signal", ["up", "down", "swipe_r", "swipe_l"]);
 
   if (error) throw new Error(`Failed to load feedback tags: ${error.message}`);
 
@@ -77,7 +79,7 @@ async function loadFeedbackTags(supabase: SupabaseClient, userId: string): Promi
     const repo = Array.isArray(row.repos) ? row.repos[0] : row.repos;
     if (!repo) continue;
     const tags = [...repo.languages, ...repo.topics];
-    if (row.signal === "up") liked.push(...tags);
+    if (row.signal === "up" || row.signal === "swipe_r") liked.push(...tags);
     else disliked.push(...tags);
   }
 

@@ -43,6 +43,9 @@ export default async function DashboardPage() {
         </a>{" "}
         <a className="btn" href="/network">
           Your network's repos
+        </a>{" "}
+        <a className="btn" href="/swipe">
+          Swipe mode
         </a>
       </p>
 
