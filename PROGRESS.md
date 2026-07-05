@@ -55,12 +55,14 @@
 - [x] Good-first-issue detection (`gfi_count` via GraphQL label search) + skill-aware matching (beginners biased toward welcoming repos) (FR-2.5, FR-3.7) — **verified live**: 179 indexed repos have good-first-issues (2582 total)
 - [ ] Plain-English/Urdu repo summaries (FR-2.6) — **not started**, needs an LLM/translation capability
 
-## Phase 3 — Social Layer — not started
+## Phase 3 — Social Layer
 
-- [ ] "Developers like you" via user-user similarity (FR-6.1)
-- [ ] Following-graph discovery (FR-6.2)
-- [ ] Maintainer repo claiming, welcoming badge (FR-6.3)
-- [ ] `?type=mywork` widget variant (FR-4.7)
+> Started ahead of the roadmap's own "500+ users" gate, per explicit user instruction (2026-07-05).
+
+- [x] "Developers like you" (`/people`) via user-user similarity — heuristic Jaccard overlap on shared topics/languages, no embeddings yet (FR-6.1) — code complete, build-verified
+- [x] Following-graph discovery (`/network`) — cross-references the user's GitHub following list against the indexed repo corpus by owner login (FR-6.2) — code complete, build-verified
+- [x] Maintainer repo claiming (`/claim`) — ownership verified against GitHub (repo owner login match), pitch + help-wanted areas, claimed repos get a small matcher score boost and a "✓ actively welcoming" badge on `/matches` and `/u/{username}` (FR-6.3) — **verified live** via a full indexer run
+- [x] Widget `?type=mywork` variant — shows the user's claimed repos pitched for contributors, falls back to a "hasn't claimed any repos yet" card (FR-4.7) — **verified live**
 
 ## Phase 4 — Swipe + Community — not started
 
