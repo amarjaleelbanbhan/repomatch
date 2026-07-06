@@ -18,6 +18,7 @@ A living roadmap of features, completed work, and upcoming priorities for the Re
 - [x] **Interactive playground** — `/ui` route showing states, triggers, and error validations (July 6, 2026)
 - [x] **Accessibility layout targets** — added `#rm-main-content` target pages for skip-to-content links (July 6, 2026)
 - [x] **Widget library guide** — created `WIDGET_LIBRARY_GUIDE.md` with playground screenshot (July 6, 2026)
+- [x] **Widget rendering fix** — added XML declaration and UTF-8 charset header to fix rendering under GitHub Camo proxy (July 6, 2026)
 
 ---
 

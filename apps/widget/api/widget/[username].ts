@@ -117,10 +117,12 @@ export default async function handler(request: Request): Promise<Response> {
       : renderSetupCardSvg(username, colors);
   }
 
-  return new Response(svg, {
+  const svgWithDeclaration = `<?xml version="1.0" encoding="UTF-8"?>\n${svg}`;
+
+  return new Response(svgWithDeclaration, {
     status: 200,
     headers: {
-      "Content-Type": "image/svg+xml",
+      "Content-Type": "image/svg+xml; charset=utf-8",
       "Cache-Control": "public, max-age=86400",
     },
   });
