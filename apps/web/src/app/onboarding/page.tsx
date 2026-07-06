@@ -24,7 +24,7 @@ export default async function OnboardingPage() {
     : await detectInterests(profile.username);
 
   return (
-    <main>
+    <main id="rm-main-content">
       <h1>{hasExistingInterests ? "Edit your interests" : "Set up your interests"}</h1>
       <OnboardingWizard
         suggestedLanguages={suggestions.languages}

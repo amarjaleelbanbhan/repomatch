@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { saveOnboarding } from "./actions";
+import { Button, Input, Badge, BadgeGroup, RadioGroup, Radio } from "@/components/ui";
 
 type SkillLevel = "beginner" | "intermediate" | "advanced";
 
@@ -51,12 +52,13 @@ export function OnboardingWizard({ suggestedLanguages, suggestedTopics, initialS
         <section>
           <h2>Step 1 of 3 — Pick 3 to 10 interests</h2>
           <p>Detected from your public repos and stars. Add or remove as you like.</p>
-          <div className="badges">
+          <BadgeGroup style={{ margin: "16px 0" } as React.CSSProperties}>
             {topicOptions.map((topic) => (
               <button
                 type="button"
-                className="chip"
                 key={topic}
+                // Keep .chip for selected visual — using aria-pressed + chip global class as before
+                className="chip"
                 aria-pressed={topics.includes(topic)}
                 onClick={() => setTopics((t) => toggle(t, topic))}
               >
@@ -64,16 +66,19 @@ export function OnboardingWizard({ suggestedLanguages, suggestedTopics, initialS
                 {topic}
               </button>
             ))}
-          </div>
-          <div>
-            <input
-              type="text"
-              placeholder="Add a custom interest"
+          </BadgeGroup>
+          <div style={{ display: "flex", gap: 8, alignItems: "flex-end", marginBottom: 16 }}>
+            <Input
+              label="Add a custom interest"
+              placeholder="e.g. embedded-systems"
               value={customTopic}
               onChange={(e) => setCustomTopic(e.target.value)}
+              style={{ maxWidth: 280 } as React.CSSProperties}
             />
-            <button
+            <Button
               type="button"
+              variant="secondary"
+              size="sm"
               onClick={() => {
                 const value = customTopic.trim().toLowerCase();
                 if (value && !topics.includes(value)) setTopics((t) => [...t, value]);
@@ -81,47 +86,63 @@ export function OnboardingWizard({ suggestedLanguages, suggestedTopics, initialS
               }}
             >
               Add
-            </button>
+            </Button>
           </div>
-          <p>{topics.length} selected</p>
-          <button type="button" disabled={!canProceedStep1} onClick={() => setStep(2)}>
-            Next
-          </button>
+          <p style={{ color: "var(--text-muted)", fontSize: "0.875rem" }}>
+            {topics.length} selected (min 3, max 10)
+          </p>
+          <Button type="button" variant="primary" disabled={!canProceedStep1} onClick={() => setStep(2)}>
+            Next →
+          </Button>
         </section>
       )}
 
       {step === 2 && (
         <section>
           <h2>Step 2 of 3 — Skill level</h2>
-          {(["beginner", "intermediate", "advanced"] as const).map((level) => (
-            <label key={level}>
-              <input
-                type="radio"
-                name="skillLevelChoice"
-                checked={skillLevel === level}
-                onChange={() => setSkillLevel(level)}
-              />
-              {level}
-            </label>
-          ))}
-          <button type="button" onClick={() => setStep(1)}>
-            Back
-          </button>
-          <button type="button" onClick={() => setStep(3)}>
-            Next
-          </button>
+          <RadioGroup
+            name="skillLevelChoice"
+            value={skillLevel}
+            onChange={(v) => setSkillLevel(v as SkillLevel)}
+            label="Select your experience level"
+            direction="vertical"
+          >
+            <Radio value="beginner" label="Beginner — new to open source or the ecosystem" />
+            <Radio value="intermediate" label="Intermediate — comfortable with PRs and code review" />
+            <Radio value="advanced" label="Advanced — maintainer-level experience" />
+          </RadioGroup>
+          <div style={{ display: "flex", gap: 8, marginTop: 24 }}>
+            <Button type="button" variant="ghost" onClick={() => setStep(1)}>
+              ← Back
+            </Button>
+            <Button type="button" variant="primary" onClick={() => setStep(3)}>
+              Next →
+            </Button>
+          </div>
         </section>
       )}
 
       {step === 3 && (
         <section>
           <h2>Step 3 of 3 — Review</h2>
-          <p>Interests: {topics.join(", ")}</p>
-          <p>Skill level: {skillLevel}</p>
-          <button type="button" onClick={() => setStep(2)}>
-            Back
-          </button>
-          <button type="submit">Save and continue</button>
+          <p style={{ marginBottom: 8 }}>Your interests:</p>
+          <BadgeGroup style={{ marginBottom: 16 } as React.CSSProperties}>
+            {topics.map((t) => (
+              <Badge key={t} variant="primary">{t}</Badge>
+            ))}
+          </BadgeGroup>
+          <p>
+            Skill level:{" "}
+            <Badge variant="info">{skillLevel}</Badge>
+          </p>
+          <div style={{ display: "flex", gap: 8, marginTop: 24 }}>
+            <Button type="button" variant="ghost" onClick={() => setStep(2)}>
+              ← Back
+            </Button>
+            <Button type="submit" variant="primary">
+              Save and continue
+            </Button>
+          </div>
         </section>
       )}
     </form>
