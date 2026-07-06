@@ -8,6 +8,32 @@
   --green: #00ffa3;
   --purple: #a78bfa;
   --radius: 10px;
+
+  /* Motion — matches existing 0.15s ease restraint */
+  --dur-fast: 100ms;
+  --dur-base: 180ms;
+  --dur-slow: 280ms;
+
+  /* Spacing scale */
+  --space-1: 4px;  --space-2: 8px;   --space-3: 12px;
+  --space-4: 16px; --space-5: 24px;  --space-6: 32px;
+  --space-7: 48px; --space-8: 64px;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+
+  /* Semantic colors */
+  --color-danger:  #f85149;
+  --color-warning: #d29922;
+  --color-success: #2ea043;
+  --color-info:    #00d9ff;
+
+  /* Focus rings — accessibility only */
+  --focus-ring:        0 0 0 3px rgba(0, 217, 255, 0.25);
+  --focus-ring-danger: 0 0 0 3px rgba(248, 81, 73, 0.25);
+  --focus-ring-green:  0 0 0 3px rgba(0, 255, 163, 0.2);
 }
 
 * {
