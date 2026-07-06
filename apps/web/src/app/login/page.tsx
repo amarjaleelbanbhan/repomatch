@@ -16,7 +16,7 @@ export default function LoginPage() {
   }
 
   return (
-    <main>
+    <main id="rm-main-content">
       <h1>Sign in to RepoMatch</h1>
       <button className="btn" onClick={signInWithGitHub}>
         Sign in with GitHub

@@ -27,7 +27,7 @@ export default async function NetworkPage() {
   });
 
   return (
-    <main>
+    <main id="rm-main-content">
       <h1>Your network's repos</h1>
       <p>
         Repos in RepoMatch's index owned by the {following.length} people you follow on GitHub.

@@ -10,7 +10,7 @@ export default async function HomePage() {
   const widgetBaseUrl = process.env.NEXT_PUBLIC_WIDGET_BASE_URL ?? "https://repomatch-widget-kappa.vercel.app";
 
   return (
-    <main>
+    <main id="rm-main-content">
       <header>
         <h1>RepoMatch</h1>
         <p>Show your OSS activity and get your next repo to try, right in your GitHub README.</p>

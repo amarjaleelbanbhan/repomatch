@@ -51,7 +51,7 @@ export default async function PublicMatchPage({ params }: Props) {
   const claimedRepoIds = new Set((claimRows ?? []).map((c) => c.repo_id));
 
   return (
-    <main>
+    <main id="rm-main-content">
       <h1>@{profile.username} on RepoMatch</h1>
       <p>
         🔥 {profile.contribution_streak}-day streak · {profile.total_contributions} contributions

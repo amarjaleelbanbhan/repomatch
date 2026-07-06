@@ -18,7 +18,7 @@ export default async function ClaimPage() {
     .eq("maintainer_user_id", user.id);
 
   return (
-    <main>
+    <main id="rm-main-content">
       <h1>Claim a repo you maintain</h1>
       <p>
         Ownership is verified against GitHub — you can only claim repos where{" "}

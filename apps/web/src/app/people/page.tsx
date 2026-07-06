@@ -32,7 +32,7 @@ export default async function PeoplePage() {
     .slice(0, 10);
 
   return (
-    <main>
+    <main id="rm-main-content">
       <h1>Developers like you</h1>
       <p>Other RepoMatch users who share your interests.</p>
 
