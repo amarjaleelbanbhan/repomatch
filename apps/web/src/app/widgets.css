@@ -1,0 +1,1130 @@
+/* =============================================================================
+   RepoMatch Widget Library — widgets.css
+   Namespace: .rm-* (prefix prevents collision with .btn, .chip, .badges globals)
+
+   Specificity strategy:
+   - globals.css highest specificity: button[type="submit"].btn-danger = (0,2,1)
+   - We use .rm-X.rm-X.rm-X triple-class = (0,3,0) to safely override all globals
+   - This is confirmed safe: no !important, no IDs, no nested rules in globals.css
+   - Every .rm-button rule uses at minimum .rm-button.rm-button to beat (0,1,1)
+   - Structural elements like <section> are avoided; Card uses <div> not <section>
+
+   Motion language: matches existing site (0.15s ease baseline)
+   - --dur-fast:  100ms  (icon rotation, checkbox tick)
+   - --dur-base:  180ms  (color/border/opacity — matches existing 150ms ±30ms)
+   - --dur-slow:  280ms  (overlay enter/exit, toast slide, skeleton shimmer cycle)
+   - Easing: ease / ease-out (enter) / ease-in (exit)
+   - NO spring, NO glow as decoration — glow only for :focus-visible ring
+============================================================================= */
+
+/* ─── Token Extensions ────────────────────────────────────────────────────── */
+:root {
+  /* Motion */
+  --dur-fast: 100ms;
+  --dur-base: 180ms;
+  --dur-slow: 280ms;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* Radius */
+  --radius-sm: 6px;
+  /* --radius: 10px  already in globals.css */
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+
+  /* Semantic colours */
+  --color-danger:  #f85149;
+  --color-warning: #d29922;
+  --color-success: #2ea043;
+  --color-info:    #00d9ff;
+
+  /* Focus rings — accessibility only, not decoration */
+  --focus-ring:        0 0 0 3px rgba(0, 217, 255, 0.25);
+  --focus-ring-danger: 0 0 0 3px rgba(248, 81, 73, 0.25);
+  --focus-ring-green:  0 0 0 3px rgba(0, 255, 163, 0.2);
+}
+
+
+/* =============================================================================
+   BUTTON
+   Renders as <button> or <a> (href prop). Override cascade:
+   - "button, .btn" (0,1,1) → beaten by .rm-button.rm-button (0,2,0)
+   - "button[type=submit], .btn" (0,1,1) → same
+   - "button[type=submit].btn-danger" (0,2,1) → beaten by .rm-button.rm-button.rm-button (0,3,0)
+   - "a.rm-button" as anchor: .rm-button.rm-button on <a> = (0,2,0) beats "a" (0,0,1)
+     and ".btn" (0,1,0). No anchor-specific globals exceed (0,1,0) so doubled class is safe.
+============================================================================= */
+.rm-button.rm-button.rm-button {
+  /* Reset everything the globals apply to <button> and .btn */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--dur-base) ease,
+              border-color var(--dur-base) ease,
+              color var(--dur-base) ease,
+              opacity var(--dur-base) ease,
+              filter var(--dur-base) ease;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Size variants */
+.rm-button--sm.rm-button--sm { font-size: 0.8125rem; padding: 5px 12px; }
+.rm-button--md.rm-button--md { font-size: 0.9rem;    padding: 9px 18px; }
+.rm-button--lg.rm-button--lg { font-size: 1rem;      padding: 12px 24px; }
+
+/* Variant: primary */
+.rm-button--primary.rm-button--primary.rm-button--primary {
+  background: linear-gradient(90deg, var(--cyan), var(--purple));
+  color: #0d1117;
+  border-color: transparent;
+}
+.rm-button--primary.rm-button--primary.rm-button--primary:hover:not(:disabled):not([aria-disabled="true"]) {
+  filter: brightness(1.1);
+  color: #0d1117;
+  text-decoration: none;
+}
+
+/* Variant: secondary */
+.rm-button--secondary.rm-button--secondary.rm-button--secondary {
+  background: var(--bg-elevated);
+  color: var(--text);
+  border-color: var(--border);
+}
+.rm-button--secondary.rm-button--secondary.rm-button--secondary:hover:not(:disabled):not([aria-disabled="true"]) {
+  border-color: var(--cyan);
+  color: var(--cyan);
+  text-decoration: none;
+}
+
+/* Variant: ghost */
+.rm-button--ghost.rm-button--ghost.rm-button--ghost {
+  background: transparent;
+  color: var(--text-muted);
+  border-color: transparent;
+}
+.rm-button--ghost.rm-button--ghost.rm-button--ghost:hover:not(:disabled):not([aria-disabled="true"]) {
+  background: rgba(255,255,255,0.05);
+  color: var(--text);
+  text-decoration: none;
+}
+
+/* Variant: danger */
+.rm-button--danger.rm-button--danger.rm-button--danger {
+  background: var(--color-danger);
+  color: #fff;
+  border-color: transparent;
+}
+.rm-button--danger.rm-button--danger.rm-button--danger:hover:not(:disabled):not([aria-disabled="true"]) {
+  filter: brightness(1.1);
+  color: #fff;
+  text-decoration: none;
+}
+
+/* States */
+.rm-button.rm-button.rm-button:disabled,
+.rm-button.rm-button.rm-button[aria-disabled="true"] {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: none;
+}
+.rm-button.rm-button.rm-button:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+.rm-button--loading.rm-button--loading {
+  cursor: wait;
+  pointer-events: none;
+}
+.rm-button__spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: rm-spin var(--dur-slow) linear infinite;
+  flex-shrink: 0;
+}
+
+
+/* =============================================================================
+   INPUT
+   Renders: <div.rm-input> > <label.rm-input__label> + <input.rm-input__field>
+   + <span.rm-input__helper> / <span.rm-input__error>
+   Override: "input[type=text]" (0,1,1) beaten by .rm-input__field.rm-input__field (0,2,0)
+   Override: "label { display:block; margin: 8px 0 }" (0,1,0) beaten by .rm-input__label (0,1,0)
+   — same specificity, but widgets.css loads after globals.css so it wins by order.
+============================================================================= */
+.rm-input {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+}
+.rm-input__label {
+  /* Overrides "label { display: block; margin: 8px 0 }" by load order */
+  display: block;
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text);
+}
+.rm-input__label--required::after {
+  content: " *";
+  color: var(--color-danger);
+}
+.rm-input__field.rm-input__field {
+  /* Overrides "input[type=text]" (0,1,1) with (0,2,0) */
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.9rem;
+  width: 100%;
+  transition: border-color var(--dur-base) ease, box-shadow var(--dur-base) ease;
+}
+.rm-input__field.rm-input__field::placeholder { color: var(--text-muted); }
+.rm-input__field.rm-input__field:focus-visible {
+  outline: none;
+  border-color: var(--cyan);
+  box-shadow: var(--focus-ring);
+}
+.rm-input__field.rm-input__field:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+/* Error state: red ring on focus (not cyan — visual signal that something is wrong AND focused) */
+.rm-input--error .rm-input__field.rm-input__field {
+  border-color: var(--color-danger);
+}
+.rm-input--error .rm-input__field.rm-input__field:focus-visible {
+  box-shadow: var(--focus-ring-danger);
+}
+.rm-input__helper { font-size: 0.775rem; color: var(--text-muted); }
+.rm-input__error  { font-size: 0.775rem; color: var(--color-danger); }
+
+
+/* =============================================================================
+   SELECT
+============================================================================= */
+.rm-select { display: flex; flex-direction: column; gap: var(--space-1); width: 100%; }
+.rm-select__label { display: block; margin: 0; font-size: 0.8125rem; font-weight: 500; color: var(--text); }
+.rm-select__label--required::after { content: " *"; color: var(--color-danger); }
+.rm-select__wrapper { position: relative; }
+.rm-select__field {
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: var(--space-2) var(--space-7) var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.9rem;
+  width: 100%;
+  cursor: pointer;
+  transition: border-color var(--dur-base) ease, box-shadow var(--dur-base) ease;
+}
+.rm-select__field:focus-visible {
+  outline: none;
+  border-color: var(--cyan);
+  box-shadow: var(--focus-ring);
+}
+.rm-select__field:disabled { opacity: 0.4; cursor: not-allowed; }
+.rm-select--error .rm-select__field { border-color: var(--color-danger); }
+.rm-select--error .rm-select__field:focus-visible { box-shadow: var(--focus-ring-danger); }
+.rm-select__chevron {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--text-muted);
+  transition: transform var(--dur-fast) ease;
+}
+.rm-select__field:focus ~ .rm-select__chevron { transform: translateY(-50%) rotate(180deg); }
+.rm-select__helper { font-size: 0.775rem; color: var(--text-muted); }
+.rm-select__error  { font-size: 0.775rem; color: var(--color-danger); }
+/* No-options placeholder */
+.rm-select__field option[disabled] { color: var(--text-muted); }
+
+
+/* =============================================================================
+   CHECKBOX
+   Override: "label { display:block; margin: 8px 0 }" via load-order + specificity
+============================================================================= */
+.rm-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.rm-checkbox.rm-checkbox label {
+  /* Overrides global label rule */
+  display: inline;
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text);
+  cursor: pointer;
+}
+.rm-checkbox__input { display: none; }
+.rm-checkbox__box {
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  position: relative;
+  transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rm-checkbox__input:checked + .rm-checkbox__box {
+  background: var(--cyan);
+  border-color: var(--cyan);
+}
+.rm-checkbox__input:indeterminate + .rm-checkbox__box {
+  background: var(--bg);
+  border-color: var(--cyan);
+}
+.rm-checkbox__input:checked + .rm-checkbox__box::after {
+  content: "";
+  width: 9px;
+  height: 5px;
+  border-left: 2px solid #0d1117;
+  border-bottom: 2px solid #0d1117;
+  transform: rotate(-45deg) translateY(-1px);
+}
+.rm-checkbox__input:indeterminate + .rm-checkbox__box::after {
+  content: "";
+  width: 8px;
+  height: 1.5px;
+  background: var(--cyan);
+}
+.rm-checkbox:focus-within .rm-checkbox__box { box-shadow: var(--focus-ring); }
+.rm-checkbox--disabled { opacity: 0.4; cursor: not-allowed; }
+.rm-checkbox--disabled.rm-checkbox label { cursor: not-allowed; }
+
+
+/* =============================================================================
+   RADIO + RADIOGROUP
+   RadioGroup is structurally required — Radio renders a bare input but
+   relies on RadioGroup to supply shared `name` and enforce mutual exclusivity.
+   A bare Radio without RadioGroup renders visually but logs a console warning
+   (enforced in the React component) and name defaults to "radio-ungrouped"
+   which means it WON'T share exclusivity with other Radios — documented in JSDoc.
+============================================================================= */
+.rm-radio-group { display: flex; flex-direction: column; gap: var(--space-2); }
+.rm-radio-group--horizontal { flex-direction: row; flex-wrap: wrap; gap: var(--space-4); }
+
+.rm-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.rm-radio.rm-radio label { display: inline; margin: 0; font-size: 0.9rem; color: var(--text); cursor: pointer; }
+.rm-radio__input { display: none; }
+.rm-radio__dot {
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 50%;
+  background: var(--bg);
+  position: relative;
+  transition: border-color var(--dur-fast) ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rm-radio__input:checked + .rm-radio__dot {
+  border-color: var(--cyan);
+}
+.rm-radio__input:checked + .rm-radio__dot::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cyan);
+}
+.rm-radio:focus-within .rm-radio__dot { box-shadow: var(--focus-ring); }
+.rm-radio--disabled { opacity: 0.4; cursor: not-allowed; }
+
+
+/* =============================================================================
+   TOGGLE (role="switch")
+============================================================================= */
+.rm-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.rm-toggle.rm-toggle label { display: inline; margin: 0; font-size: 0.9rem; color: var(--text); cursor: pointer; }
+.rm-toggle__track {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  background: var(--border);
+  transition: background var(--dur-base) ease;
+  flex-shrink: 0;
+}
+.rm-toggle__thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform var(--dur-base) ease;
+}
+.rm-toggle--checked .rm-toggle__track { background: var(--cyan); }
+.rm-toggle--checked .rm-toggle__thumb { transform: translateX(16px); }
+.rm-toggle--disabled { opacity: 0.4; cursor: not-allowed; }
+.rm-toggle:focus-within .rm-toggle__track { box-shadow: var(--focus-ring); }
+/* Sizes */
+.rm-toggle--sm .rm-toggle__track { width: 28px; height: 16px; }
+.rm-toggle--sm .rm-toggle__thumb { width: 12px; height: 12px; }
+.rm-toggle--sm.rm-toggle--checked .rm-toggle__thumb { transform: translateX(12px); }
+.rm-toggle--lg .rm-toggle__track { width: 44px; height: 24px; }
+.rm-toggle--lg .rm-toggle__thumb { width: 20px; height: 20px; }
+.rm-toggle--lg.rm-toggle--checked .rm-toggle__thumb { transform: translateX(20px); }
+
+
+/* =============================================================================
+   BADGE
+   Does NOT use .chip — completely separate class hierarchy.
+============================================================================= */
+.rm-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.775rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rm-badge--sm { padding: 2px 7px; font-size: 0.7rem; }
+.rm-badge--lg { padding: 5px 14px; font-size: 0.85rem; }
+
+.rm-badge--primary   { background: rgba(0,217,255,0.1);  color: var(--cyan);          border-color: rgba(0,217,255,0.25); }
+.rm-badge--secondary { background: var(--bg-elevated);   color: var(--text-muted);    border-color: var(--border); }
+.rm-badge--success   { background: rgba(46,160,67,0.15); color: var(--green);         border-color: rgba(46,160,67,0.3); }
+.rm-badge--warning   { background: rgba(210,153,34,0.15);color: var(--color-warning); border-color: rgba(210,153,34,0.3); }
+.rm-badge--danger    { background: rgba(248,81,73,0.15); color: var(--color-danger);  border-color: rgba(248,81,73,0.3); }
+.rm-badge--info      { background: rgba(0,217,255,0.1);  color: var(--cyan);          border-color: rgba(0,217,255,0.2); }
+
+.rm-badge-group {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Removable badge */
+.rm-badge__remove {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-left: var(--space-1);
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.6;
+  font-size: 0.85em;
+  line-height: 1;
+  transition: opacity var(--dur-fast) ease;
+}
+.rm-badge__remove:hover { opacity: 1; }
+
+
+/* =============================================================================
+   AVATAR
+============================================================================= */
+.rm-avatar {
+  border-radius: 50%;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+.rm-avatar--sm { width: 24px; height: 24px; font-size: 0.65rem; }
+.rm-avatar--md { width: 36px; height: 36px; font-size: 0.85rem; }
+.rm-avatar--lg { width: 56px; height: 56px; font-size: 1.2rem; }
+.rm-avatar img {
+  /* Override globals: "img { border-radius: var(--radius); border: 1px solid var(--border) }" */
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0;  /* parent clips */
+  border: none;
+}
+.rm-avatar__fallback {
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+
+/* =============================================================================
+   CARD
+   Uses <div> NOT <section> — avoids "section { margin-top: 40px }" entirely.
+============================================================================= */
+.rm-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color var(--dur-base) ease;
+}
+.rm-card--hoverable:hover { border-color: var(--cyan); }
+.rm-card__header {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--border);
+}
+.rm-card__body  { padding: var(--space-4) var(--space-5); }
+.rm-card__footer {
+  padding: var(--space-3) var(--space-5);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+/* Title inside card header — override "h2 { color: var(--cyan) }" by specificity */
+.rm-card__header .rm-card__title {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--text);
+  font-family: inherit;
+  letter-spacing: normal;
+}
+
+
+/* =============================================================================
+   MODAL
+   Uses <dialog> — no global selector targets <dialog>, zero conflict.
+   Z-index stacking: managed via CSS variable --rm-modal-z (set inline per instance).
+   Default z-index: 1000. Each concurrent open instance receives z-index = 1000 + (openCount * 10).
+   Counter lifecycle: increments on open, decrements on close → does NOT keep climbing.
+   The counter lives in React state (not CSS), so it resets on page navigation.
+   SSR safety: Modal renders with aria-modal but dialog[open] is set client-side only.
+============================================================================= */
+.rm-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: var(--rm-modal-z, 1000);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  animation: rm-backdrop-in var(--dur-base) ease-out;
+}
+.rm-modal {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  animation: rm-modal-in var(--dur-base) ease-out;
+  z-index: calc(var(--rm-modal-z, 1000) + 1);
+}
+.rm-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+.rm-modal__title {
+  /* Override "h2 { color: var(--cyan) }" via specificity .rm-modal__title */
+  margin: 0;
+  font-size: 1.125rem;
+  color: var(--text);
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  letter-spacing: -0.02em;
+}
+.rm-modal__close.rm-modal__close.rm-modal__close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: var(--space-1);
+  border-radius: var(--radius-sm);
+  line-height: 1;
+  font-size: 1.1rem;
+  transition: color var(--dur-fast) ease;
+}
+.rm-modal__close.rm-modal__close.rm-modal__close:hover { color: var(--text); }
+.rm-modal__close.rm-modal__close.rm-modal__close:focus-visible { box-shadow: var(--focus-ring); outline: none; }
+.rm-modal__body  { margin-bottom: var(--space-4); }
+.rm-modal__footer {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: flex-end;
+}
+
+@keyframes rm-backdrop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes rm-modal-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+
+/* =============================================================================
+   TOAST
+   Priority-aware eviction: danger/error toasts evict oldest non-danger toast first.
+   If all queued toasts are danger, they still evict oldest danger (no silent drops).
+   Max queue: 5 visible toasts.
+   Enter: slides up from bottom-right (translateY(16px) → 0, 180ms ease-out).
+   Exit: slides down + fades (translateY(8px) + opacity 0, 180ms ease-in).
+   Progress bar: linear depletion over auto-dismiss duration (default 4000ms).
+============================================================================= */
+.rm-toast-region {
+  position: fixed;
+  bottom: var(--space-5);
+  right: var(--space-5);
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  pointer-events: none;
+  max-width: 360px;
+  width: calc(100vw - 2 * var(--space-5));
+}
+.rm-toast {
+  pointer-events: all;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-3) var(--space-4);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  position: relative;
+  overflow: hidden;
+  animation: rm-toast-in var(--dur-base) ease-out;
+}
+.rm-toast--exiting {
+  animation: rm-toast-out var(--dur-base) ease-in forwards;
+}
+.rm-toast__icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+.rm-toast__content { flex: 1; min-width: 0; }
+.rm-toast__title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 2px;
+  /* Override h2 global */
+  font-family: inherit;
+  letter-spacing: normal;
+}
+.rm-toast__message {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.rm-toast__dismiss.rm-toast__dismiss.rm-toast__dismiss {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: color var(--dur-fast) ease;
+}
+.rm-toast__dismiss.rm-toast__dismiss.rm-toast__dismiss:hover { color: var(--text); }
+.rm-toast__dismiss.rm-toast__dismiss.rm-toast__dismiss:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+/* Accent bar (top border) by variant */
+.rm-toast--success { border-top: 3px solid var(--color-success); }
+.rm-toast--danger  { border-top: 3px solid var(--color-danger);  }
+.rm-toast--warning { border-top: 3px solid var(--color-warning); }
+.rm-toast--info    { border-top: 3px solid var(--color-info);    }
+
+/* Progress bar — depletes left-to-right */
+.rm-toast__progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  border-radius: 0;
+  transform-origin: left;
+  animation: rm-toast-progress linear forwards;
+}
+.rm-toast--success .rm-toast__progress { background: var(--color-success); }
+.rm-toast--danger  .rm-toast__progress { background: var(--color-danger);  }
+.rm-toast--warning .rm-toast__progress { background: var(--color-warning); }
+.rm-toast--info    .rm-toast__progress { background: var(--color-info);    }
+
+@keyframes rm-toast-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes rm-toast-out {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(8px); }
+}
+@keyframes rm-toast-progress {
+  from { width: 100%; }
+  to   { width: 0%; }
+}
+
+
+/* =============================================================================
+   TOOLTIP
+   Flips near viewport edges (handled in JS). Shows on :hover and :focus-visible.
+============================================================================= */
+.rm-tooltip-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+.rm-tooltip {
+  position: absolute;
+  z-index: 500;
+  background: #1c2128;
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 0.775rem;
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--dur-fast) ease;
+  max-width: 240px;
+  white-space: normal;
+  text-align: center;
+}
+.rm-tooltip--visible { opacity: 1; }
+
+/* Placement */
+.rm-tooltip--top    { bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); }
+.rm-tooltip--bottom { top:    calc(100% + 6px); left: 50%; transform: translateX(-50%); }
+.rm-tooltip--left   { right:  calc(100% + 6px); top:  50%; transform: translateY(-50%); }
+.rm-tooltip--right  { left:   calc(100% + 6px); top:  50%; transform: translateY(-50%); }
+
+/* Arrow */
+.rm-tooltip::after {
+  content: "";
+  position: absolute;
+  border: 5px solid transparent;
+}
+.rm-tooltip--top::after    { top: 100%;    left: 50%; transform: translateX(-50%); border-top-color: var(--border); }
+.rm-tooltip--bottom::after { bottom: 100%; left: 50%; transform: translateX(-50%); border-bottom-color: var(--border); }
+.rm-tooltip--left::after   { left: 100%;   top:  50%; transform: translateY(-50%); border-left-color: var(--border); }
+.rm-tooltip--right::after  { right: 100%;  top:  50%; transform: translateY(-50%); border-right-color: var(--border); }
+
+
+/* =============================================================================
+   TABS
+   Roving tabindex: arrow keys cycle within tab list; Tab exits to panel.
+============================================================================= */
+.rm-tabs { display: flex; flex-direction: column; }
+.rm-tabs__list {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  gap: 0;
+}
+.rm-tabs__tab {
+  padding: var(--space-2) var(--space-4);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color var(--dur-base) ease, border-color var(--dur-base) ease;
+  position: relative;
+  top: 1px; /* align bottom border with list border */
+  margin-bottom: -1px;
+}
+/* Override global "button, .btn" with .rm-tabs__tab.rm-tabs__tab (0,2,0) */
+.rm-tabs__tab.rm-tabs__tab {
+  padding: var(--space-2) var(--space-4);
+  background: transparent;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  border-radius: 0;
+}
+.rm-tabs__tab.rm-tabs__tab:hover { color: var(--text); border-bottom-color: var(--border); }
+.rm-tabs__tab.rm-tabs__tab[aria-selected="true"] { color: var(--cyan); border-bottom-color: var(--cyan); }
+.rm-tabs__tab.rm-tabs__tab:focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
+.rm-tabs__panel { padding: var(--space-4) 0; }
+.rm-tabs__panel:focus-visible { outline: none; }
+
+
+/* =============================================================================
+   SPINNER
+============================================================================= */
+.rm-spinner {
+  display: inline-block;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  border-top-color: var(--cyan);
+  animation: rm-spin var(--dur-slow) linear infinite;
+}
+.rm-spinner--sm { width: 16px; height: 16px; }
+.rm-spinner--md { width: 24px; height: 24px; }
+.rm-spinner--lg { width: 40px; height: 40px; border-width: 3px; }
+
+@keyframes rm-spin {
+  to { transform: rotate(360deg); }
+}
+
+
+/* =============================================================================
+   SKELETON
+   Shimmer moves left→right (not top-down).
+   Gradient: 40% wide highlight at 4% white opacity — subtle against #151b23.
+   Duration: 1.4s linear, infinite loop. Width-relative so narrow skeletons
+   don't look like disco lights.
+============================================================================= */
+.rm-skeleton {
+  background: var(--bg-elevated);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  position: relative;
+}
+.rm-skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,0.04) 40%,
+    rgba(255,255,255,0.07) 50%,
+    rgba(255,255,255,0.04) 60%,
+    transparent 100%
+  );
+  background-size: 250% 100%;
+  animation: rm-shimmer 1.4s linear infinite;
+}
+
+@keyframes rm-shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -50% 0; }
+}
+
+/* Preset shapes */
+.rm-skeleton--text  { height: 1em; }
+.rm-skeleton--title { height: 1.5em; }
+.rm-skeleton--circle { border-radius: 50%; }
+.rm-skeleton--rect  { border-radius: var(--radius); }
+
+
+/* =============================================================================
+   PROGRESS BAR
+   Value clamped 0–100 in React. Indeterminate when value prop is undefined.
+============================================================================= */
+.rm-progress { width: 100%; }
+.rm-progress__label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.775rem;
+  color: var(--text-muted);
+  margin-bottom: var(--space-1);
+}
+.rm-progress__track {
+  height: 6px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+.rm-progress--lg .rm-progress__track { height: 10px; }
+.rm-progress--sm .rm-progress__track { height: 3px; }
+.rm-progress__fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--cyan), var(--purple));
+  border-radius: var(--radius-full);
+  transition: width var(--dur-slow) ease;
+}
+/* Indeterminate */
+.rm-progress--indeterminate .rm-progress__fill {
+  width: 40% !important;
+  animation: rm-progress-indeterminate 1.4s ease-in-out infinite;
+}
+@keyframes rm-progress-indeterminate {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(350%); }
+}
+
+
+/* =============================================================================
+   DROPDOWN
+   Opens upward if near bottom of viewport (handled in JS via .rm-dropdown--up).
+============================================================================= */
+.rm-dropdown { position: relative; display: inline-block; }
+.rm-dropdown__menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 300;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-1);
+  min-width: 180px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  animation: rm-dropdown-in var(--dur-fast) ease-out;
+}
+.rm-dropdown--up .rm-dropdown__menu {
+  top: auto;
+  bottom: calc(100% + 4px);
+  animation: rm-dropdown-up-in var(--dur-fast) ease-out;
+}
+.rm-dropdown__item.rm-dropdown__item.rm-dropdown__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.875rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--dur-fast) ease, color var(--dur-fast) ease;
+  text-decoration: none;
+}
+.rm-dropdown__item.rm-dropdown__item.rm-dropdown__item:hover,
+.rm-dropdown__item.rm-dropdown__item.rm-dropdown__item:focus-visible { background: rgba(255,255,255,0.05); color: var(--text); outline: none; }
+.rm-dropdown__item.rm-dropdown__item.rm-dropdown__item[aria-disabled="true"] { opacity: 0.4; cursor: not-allowed; }
+.rm-dropdown__item--danger.rm-dropdown__item--danger { color: var(--color-danger); }
+.rm-dropdown__item--danger.rm-dropdown__item--danger:hover { background: rgba(248,81,73,0.08); }
+.rm-dropdown__separator {
+  height: 1px;
+  background: var(--border);
+  margin: var(--space-1) 0;
+}
+.rm-dropdown__empty {
+  padding: var(--space-3);
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  text-align: center;
+}
+
+@keyframes rm-dropdown-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes rm-dropdown-up-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+
+/* =============================================================================
+   TABLE
+   Client-side sort + pagination (pageSize prop, default 20).
+   Max expected rows: ≤200 (each user gets at most 20 recs/cycle × 10 cycles = 200).
+   Supabase queries use .order("rank").limit() — no unbounded fetches in existing code.
+   Virtualization is NOT included. If row count exceeds 200 in future, add react-virtual.
+============================================================================= */
+.rm-table-wrapper { width: 100%; overflow-x: auto; }
+.rm-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+.rm-table th {
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  font-size: 0.775rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.rm-table td {
+  padding: var(--space-2) var(--space-3);
+  color: var(--text);
+  border-bottom: 1px solid rgba(33,38,45,0.6);
+  vertical-align: middle;
+}
+.rm-table tr:last-child td { border-bottom: none; }
+.rm-table tbody tr { transition: background var(--dur-fast) ease; }
+.rm-table tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+/* Sortable column header */
+.rm-table__sort-btn.rm-table__sort-btn.rm-table__sort-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  font-size: 0.775rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.rm-table__sort-btn.rm-table__sort-btn.rm-table__sort-btn:focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: 2px; }
+.rm-table__sort-icon { opacity: 0.4; font-size: 0.65rem; }
+.rm-table__sort-icon--active { opacity: 1; color: var(--cyan); }
+
+/* Empty state */
+.rm-table__empty {
+  padding: var(--space-7) var(--space-5);
+  text-align: center;
+  color: var(--text-muted);
+}
+.rm-table__empty-icon { font-size: 2rem; margin-bottom: var(--space-2); }
+.rm-table__empty-text { font-size: 0.875rem; }
+
+/* Pagination */
+.rm-table-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) 0;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+.rm-table-pagination__controls { display: flex; gap: var(--space-2); align-items: center; }
+
+
+/* =============================================================================
+   NAVBAR
+   Includes skip-to-content link targeting #rm-main-content.
+   All pages that use Navbar MUST include an element with id="rm-main-content"
+   as the first content element after the nav.
+============================================================================= */
+.rm-navbar {
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+/* Skip-to-content: visually hidden until focused */
+.rm-skip-link.rm-skip-link.rm-skip-link {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  background: var(--bg-elevated);
+  color: var(--cyan);
+  border: 1px solid var(--cyan);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-120%);
+  transition: transform var(--dur-fast) ease;
+  z-index: 200;
+}
+.rm-skip-link.rm-skip-link.rm-skip-link:focus {
+  transform: translateY(0);
+}
+.rm-navbar__inner {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 var(--space-5);
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+.rm-navbar__brand {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  text-decoration: none;
+  background: linear-gradient(90deg, var(--cyan), var(--purple));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.rm-navbar__brand:hover { text-decoration: none; filter: brightness(1.1); }
+.rm-navbar__links { display: flex; align-items: center; gap: var(--space-1); flex: 1; }
+.rm-navbar__link {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  transition: color var(--dur-base) ease, background var(--dur-base) ease;
+}
+.rm-navbar__link:hover { color: var(--text); background: rgba(255,255,255,0.04); text-decoration: none; }
+.rm-navbar__link--active { color: var(--cyan); }
+.rm-navbar__user { display: flex; align-items: center; gap: var(--space-2); margin-left: auto; }
+.rm-navbar__username {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Responsive: hide links on mobile if needed */
+@media (max-width: 480px) {
+  .rm-navbar__links { display: none; }
+}

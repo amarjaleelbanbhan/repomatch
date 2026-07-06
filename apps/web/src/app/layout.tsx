@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import "./globals.css";
+import "./widgets.css";
 
 export const metadata = {
   title: "RepoMatch",
