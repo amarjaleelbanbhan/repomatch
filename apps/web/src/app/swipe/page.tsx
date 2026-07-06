@@ -57,7 +57,7 @@ export default async function SwipePage() {
     .filter((c): c is SwipeCard => c !== null);
 
   return (
-    <main>
+    <main id="rm-main-content">
       <h1>Swipe your matches</h1>
       <p>Swipe right (or tap 👍) to save, left (or tap 👎) to pass.</p>
       <SwipeDeck cards={cards} />
