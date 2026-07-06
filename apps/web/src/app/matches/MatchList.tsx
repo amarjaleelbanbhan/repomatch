@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { submitFeedback } from "./actions";
+import { Button, Select, Checkbox, Badge, Card } from "@/components/ui";
 
 export interface Match {
   repoId: string;
@@ -45,58 +46,99 @@ export function MatchList({ matches }: Props) {
 
   return (
     <div>
-      <div>
-        <label>
-          Language:{" "}
-          <select value={language} onChange={(e) => setLanguage(e.target.value)}>
-            <option value="all">All</option>
-            {languages.map((lang) => (
-              <option key={lang} value={lang}>
-                {lang}
-              </option>
-            ))}
-          </select>
-        </label>
-        {"  "}
-        <label>
-          <input
-            type="checkbox"
+      {/* Filters */}
+      <div style={{ display: "flex", gap: 16, alignItems: "flex-end", marginBottom: 24, flexWrap: "wrap" }}>
+        <Select
+          label="Language"
+          options={[{ value: "all", label: "All languages" }, ...languages.map((l) => ({ value: l, label: l }))]}
+          value={language}
+          onChange={setLanguage}
+          style={{ maxWidth: 220 } as React.CSSProperties}
+        />
+        <div style={{ paddingBottom: 2 }}>
+          <Checkbox
+            label="Welcoming repos only (has CONTRIBUTING.md)"
             checked={welcomingOnly}
-            onChange={(e) => setWelcomingOnly(e.target.checked)}
+            onChange={setWelcomingOnly}
           />
-          Welcoming repos only (has CONTRIBUTING.md)
-        </label>
+        </div>
       </div>
 
-      {filtered.map((match) => (
-        <section key={match.repoId}>
-          <h2>
-            {match.fullName} {match.isClaimed && <span className="chip">✓ actively welcoming</span>}
-          </h2>
-          <p>{match.description || "No description available."}</p>
-          <p>
-            {match.languages.join(", ")} · ★ {match.stars} · health {match.healthScore.toFixed(0)}
-            {match.hasContributing ? " · has CONTRIBUTING.md" : ""}
-          </p>
-          <p>{match.reason}</p>
-          <div>
-            <button type="button" onClick={() => react(match.repoId, "up")}>
-              👍
-            </button>
-            <button type="button" onClick={() => react(match.repoId, "down")}>
-              👎
-            </button>
-            <button type="button" onClick={() => react(match.repoId, "known")}>
-              Already know it
-            </button>
-            <button type="button" onClick={() => react(match.repoId, "hide")}>
-              Hide
-            </button>
-          </div>
-        </section>
-      ))}
+      {/* Match cards */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        {filtered.map((match) => (
+          <Card key={match.repoId}>
+            <Card.Header>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                <h3 className="rm-card__title">{match.fullName}</h3>
+                {match.isClaimed && (
+                  <Badge variant="success">✓ actively welcoming</Badge>
+                )}
+                {match.hasContributing && !match.isClaimed && (
+                  <Badge variant="info">has CONTRIBUTING.md</Badge>
+                )}
+              </div>
+            </Card.Header>
+            <Card.Body>
+              <p style={{ color: "var(--text-muted)", marginBottom: 8 }}>
+                {match.description || "No description available."}
+              </p>
+              <p style={{ color: "var(--text-muted)", marginBottom: 8, fontSize: "0.875rem" }}>
+                {match.reason}
+              </p>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                {match.languages.map((l) => (
+                  <Badge key={l} variant="secondary" size="sm">{l}</Badge>
+                ))}
+                <Badge variant="secondary" size="sm">★ {match.stars.toLocaleString()}</Badge>
+                <Badge variant="secondary" size="sm">health {match.healthScore.toFixed(0)}</Badge>
+              </div>
+            </Card.Body>
+            <Card.Footer>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => react(match.repoId, "up")}
+                aria-label="Upvote this repository"
+              >
+                👍 Looks good
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => react(match.repoId, "down")}
+                aria-label="Downvote this repository"
+              >
+                👎 Not for me
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => react(match.repoId, "known")}
+              >
+                Already know it
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => react(match.repoId, "hide")}
+              >
+                Hide
+              </Button>
+            </Card.Footer>
+          </Card>
+        ))}
+      </div>
 
-      {filtered.length === 0 && <p>No matches left with these filters.</p>}
+      {filtered.length === 0 && (
+        <p style={{ color: "var(--text-muted)", marginTop: 32, textAlign: "center" }}>
+          No matches left with these filters.
+        </p>
+      )}
     </div>
   );
 }

@@ -81,7 +81,7 @@ export default async function MatchesPage() {
     .filter((m) => m.feedback !== "hide" && m.feedback !== "known" && m.feedback !== "swipe_l");
 
   return (
-    <main>
+    <main id="rm-main-content">
       <h1>Your matches</h1>
       <p>{matches.length} repos matched to your interests. React to tune future cycles.</p>
       <MatchList matches={matches} />
